@@ -1,0 +1,228 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+[package]
+name = "tenon"
+default-run = "tenon"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97.1"
+license = "Apache-2.0"
+repository = "https://github.com/apache/incubator-bifromq-tenon"
+publish = false
+
+[features]
+loom-model = ["tenon-ipc/loom-model"]
+repository-test-support = ["tenon-ipc/repository-test-support"]
+
+[[bin]]
+name = "runner-extension-fixture"
+path = "tests/fixtures/runner_extensions.rs"
+required-features = ["repository-test-support"]
+test = false
+bench = false
+
+[[test]]
+name = "egress_record_contract"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "ingress_queue_contract"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "ingress_record_contract"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "pipeline_control_contract"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "pipeline_process"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "runner_cli"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "runner_http"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "runner_resource_limits"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "runner_java_archetype"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "runner_metrics"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "tenon_document_jsonc_contract"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "tenon_document_verification_contract"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "runner_extensions"
+required-features = ["repository-test-support"]
+
+[workspace]
+members = [".", "ipc/rust/tenon-ipc", "sdk/rust/plugin-sdk", "plugin/bifromq-tenon-mqtt-plugin", "plugin/bifromq-tenon-dummy-source-plugin", "plugin/bifromq-tenon-stdout-sink-plugin"]
+resolver = "3"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97.1"
+license = "Apache-2.0"
+repository = "https://github.com/apache/incubator-bifromq-tenon"
+publish = false
+
+[profile.dev]
+debug = "line-tables-only"
+
+[workspace.dependencies]
+tenon-ipc = { path = "ipc/rust/tenon-ipc", version = "=0.1.0" }
+axum = { version = "=0.8.9", default-features = false, features = ["http1", "json", "query", "tokio"] }
+base64 = { version = "=0.23.0", default-features = false, features = ["std"] }
+bytes = "=1.12.1"
+cpu-time = "=1.0.0"
+criterion = { version = "=0.8.2", default-features = false }
+flate2 = { version = "=1.1.9", default-features = false, features = ["rust_backend"] }
+futures-util = { version = "=0.3.34", default-features = false, features = ["std"] }
+getrandom = { version = "=0.3.4", features = ["std"] }
+hyper = { version = "=1.11.1", default-features = false, features = ["http1", "http2", "client", "server"] }
+hyper-util = { version = "=0.1.20", default-features = false, features = ["tokio", "service", "client", "http1"] }
+jsonc-parser = { version = "=0.33.0", default-features = false }
+jsonschema = { version = "=0.53.0", default-features = false, features = ["idna"] }
+libc = "=0.2.186"
+loom = { version = "=0.7.2", default-features = false }
+memmap2 = "=0.9.11"
+mlua = { version = "=0.12.1", default-features = false, features = ["lua55", "vendored"] }
+opentelemetry = { version = "=0.32.0", default-features = false, features = ["metrics"] }
+opentelemetry-proto = { version = "=0.32.0", default-features = false, features = ["gen-tonic-messages", "metrics"] }
+opentelemetry_sdk = { version = "=0.32.1", default-features = false, features = ["metrics", "experimental_metrics_custom_reader"] }
+proptest = { version = "=1.11.0", default-features = false, features = ["std"] }
+prost = "=0.14.4"
+prost-build = "=0.14.4"
+prost-reflect = "=0.16.5"
+prost-types = "=0.14.4"
+protoc-bin-vendored = "=3.2.0"
+rustix = { version = "=1.1.4", default-features = false, features = ["fs", "process", "std", "thread"] }
+rustls = { version = "=0.23.44", default-features = false, features = ["ring", "std", "tls12"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = { version = "=1.0.151", features = ["arbitrary_precision"] }
+sha2 = { version = "=0.11.0", default-features = false }
+tar = { version = "=0.4.46", default-features = false }
+tempfile = "=3.27.0"
+tokio = { version = "=1.53.1", default-features = false, features = ["io-util", "macros", "net", "process", "rt", "signal", "sync", "time"] }
+tokio-util = { version = "=0.7.19", default-features = false, features = ["rt"] }
+tower = { version = "=0.5.3", default-features = false, features = ["util"] }
+tokio-rustls = { version = "=0.26.5", default-features = false, features = ["ring", "tls12"] }
+tokio-stream = { version = "=0.1.17", default-features = false, features = ["net", "sync"] }
+tonic = { version = "=0.14.6", default-features = false, features = ["codegen", "router", "transport"] }
+tonic-prost = "=0.14.6"
+tonic-prost-build = { version = "=0.14.6", default-features = false, features = ["transport"] }
+utoipa = { version = "=5.5.0", default-features = false, features = ["macros"] }
+utoipa-axum = { version = "=0.2.0", default-features = false }
+zeroize = { version = "=1.9.0", default-features = false, features = ["alloc"] }
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+missing_debug_implementations = "warn"
+unused_must_use = "deny"
+
+[workspace.lints.clippy]
+correctness = { level = "deny", priority = -1 }
+suspicious = { level = "deny", priority = -1 }
+style = { level = "warn", priority = -1 }
+complexity = { level = "warn", priority = -1 }
+perf = { level = "warn", priority = -1 }
+dbg_macro = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+unwrap_used = "deny"
+
+[workspace.lints.rustdoc]
+broken_intra_doc_links = "deny"
+
+[lints]
+workspace = true
+
+[dependencies]
+tenon-ipc.workspace = true
+axum.workspace = true
+base64.workspace = true
+bytes.workspace = true
+cpu-time.workspace = true
+flate2.workspace = true
+futures-util.workspace = true
+getrandom.workspace = true
+hyper.workspace = true
+hyper-util.workspace = true
+jsonc-parser.workspace = true
+jsonschema.workspace = true
+mlua.workspace = true
+opentelemetry.workspace = true
+opentelemetry-proto.workspace = true
+opentelemetry_sdk.workspace = true
+prost.workspace = true
+prost-reflect.workspace = true
+prost-types.workspace = true
+rustix.workspace = true
+rustls.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tar.workspace = true
+tempfile.workspace = true
+tokio.workspace = true
+tokio-rustls.workspace = true
+tokio-stream.workspace = true
+tonic.workspace = true
+tonic-prost.workspace = true
+utoipa.workspace = true
+utoipa-axum.workspace = true
+zeroize.workspace = true
+
+[target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
+libc.workspace = true
+
+[build-dependencies]
+prost-build.workspace = true
+protoc-bin-vendored.workspace = true
+tonic-prost-build.workspace = true
+
+[dev-dependencies]
+memmap2.workspace = true
+tenon-ipc = { workspace = true, features = ["repository-test-support"] }
+criterion.workspace = true
+loom.workspace = true
+proptest.workspace = true
+protoc-bin-vendored.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["test-util"] }

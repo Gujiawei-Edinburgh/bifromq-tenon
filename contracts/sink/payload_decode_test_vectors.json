@@ -1,0 +1,69 @@
+{
+  "formatVersion": 1,
+  "matching": {
+    "name": "Queue owner selects the generated Sink payload parser",
+    "destination": "events",
+    "body": [
+      0,
+      127,
+      128,
+      255
+    ],
+    "payload": [
+      10,
+      6,
+      101,
+      118,
+      101,
+      110,
+      116,
+      115,
+      18,
+      4,
+      0,
+      127,
+      128,
+      255
+    ],
+    "encoded": [
+      10,
+      14,
+      10,
+      6,
+      101,
+      118,
+      101,
+      110,
+      116,
+      115,
+      18,
+      4,
+      0,
+      127,
+      128,
+      255
+    ]
+  },
+  "malformed": [
+    {
+      "name": "Malformed outer record",
+      "encoded": [
+        10,
+        2,
+        1
+      ],
+      "expectedErrorCode": "sink.egress_record_invalid"
+    },
+    {
+      "name": "Malformed payload selected by Queue owner",
+      "encoded": [
+        10,
+        3,
+        10,
+        2,
+        97
+      ],
+      "expectedErrorCode": "sink.payload_invalid"
+    }
+  ]
+}

@@ -1,0 +1,664 @@
+{
+  "valid": [
+    {"name":"Flow parallelism accepts multiplier 1.5","document":{"specVersion":"1","id":"missing-count","pluginInstances":{"a":{"programName":"com.example.a","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"a","process":{"script":"function main(event) end"},"sinks":["a"],"parallelism":1.5}}}},
+    {"name":"Flow parallelism accepts multiplier 10.0","document":{"specVersion":"1","id":"missing-count","pluginInstances":{"a":{"programName":"com.example.a","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"a","process":{"script":"function main(event) end"},"sinks":["a"],"parallelism":10.0}}}},
+    {"name":"Flow maxPendingRecords accepts 1","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxPendingRecords":1}}}},
+    {"name":"Flow maxPendingRecords accepts 2147483646","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxPendingRecords":2147483646}}}},
+    {"name":"Flow maxRecordBytes accepts 1024","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":1024}}}},
+    {"name":"Flow maxRecordBytes accepts 17825792","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":17825792}}}},
+    {"name":"Flow maxRecordBytes accepts 2147483632","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":2147483632}}}},
+    {"name": "CPU and memory resource limits", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"cpu": 1.5, "memoryBytes": 536870912}}},
+    {"name": "CPU resource limit only", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"cpu": 0.01}}},
+    {"name": "Memory resource limit only", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"memoryBytes": 1}}},
+    {"name": "Empty resource limits", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {}}},
+    {
+      "name": "Instance startup arguments and environment preserve authored values",
+      "document": {
+        "specVersion": "1",
+        "id": "startup-settings",
+        "pluginInstances": {
+          "source": {
+            "programName": "com.example.source",
+            "exactVersion": "1.0.0",
+            "extraArgs": {"args": ["a b", "", "$HOME"], "position": "prepend"},
+            "env": {"APP_REGION": "cn-north", "EMPTY": ""},
+            "config": {}
+          },
+          "sink": {
+            "programName": "com.example.sink",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {"source": "source", "process": {"script": "function main(event) emit() end"}, "sinks": ["sink"]}
+        }
+      }
+    },
+    {
+      "name": "One directed Flow with separate Plugin Instances",
+      "document": {
+        "specVersion": "1",
+        "id": "factory-uplink",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.modbus",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "cloud": {
+            "programName": "com.example.kafka",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "telemetry": {
+            "parallelism": 1,
+            "source": "device",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "cloud"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Dual-interface Instance can feed its own Sink interface",
+      "document": {
+        "specVersion": "1",
+        "id": "local-control",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.device",
+            "exactVersion": "1.0.0",
+            "config": null
+          }
+        },
+        "flows": {
+          "self": {
+            "parallelism": 0.5,
+            "source": "device",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "device"
+            ],
+            "delivery": "at-most-once"
+          }
+        }
+      }
+    },
+    {
+      "name": "Two dual-interface Instances form opposite directed Flows",
+      "document": {
+        "specVersion": "1",
+        "id": "industrial-gateway",
+        "pluginInstances": {
+          "driver": {
+            "programName": "com.example.driver",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "application": {
+            "programName": "com.example.application",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "telemetry": {
+            "parallelism": 1,
+            "source": "driver",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "application"
+            ]
+          },
+          "commands": {
+            "parallelism": 1,
+            "source": "application",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "driver"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Flow parallelism may be omitted",
+      "document": {
+        "specVersion": "1",
+        "id": "missing-count",
+        "pluginInstances": {
+          "a": {
+            "programName": "com.example.a",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "source": "a",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "a"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "invalid": [
+    {"name":"Flow maxPendingRecords rejects 0","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxPendingRecords":0}}},"expectedInstancePointer":"/flows/main/maxPendingRecords"},
+    {"name":"Flow maxPendingRecords rejects -1","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxPendingRecords":-1}}},"expectedInstancePointer":"/flows/main/maxPendingRecords"},
+    {"name":"Flow maxPendingRecords rejects 1.5","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxPendingRecords":1.5}}},"expectedInstancePointer":"/flows/main/maxPendingRecords"},
+    {"name":"Flow maxPendingRecords rejects None","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxPendingRecords":null}}},"expectedInstancePointer":"/flows/main/maxPendingRecords"},
+    {"name":"Flow maxPendingRecords rejects '100'","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxPendingRecords":"100"}}},"expectedInstancePointer":"/flows/main/maxPendingRecords"},
+    {"name":"Flow maxPendingRecords rejects 18446744073709551616","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxPendingRecords":18446744073709551616}}},"expectedInstancePointer":"/flows/main/maxPendingRecords"},
+    {"name":"Flow maxRecordBytes rejects 0","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":0}}},"expectedInstancePointer":"/flows/main/maxRecordBytes"},
+    {"name":"Flow maxRecordBytes rejects -1","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":-1}}},"expectedInstancePointer":"/flows/main/maxRecordBytes"},
+    {"name":"Flow maxRecordBytes rejects 1023","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":1023}}},"expectedInstancePointer":"/flows/main/maxRecordBytes"},
+    {"name":"Flow maxRecordBytes rejects 1024.5","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":1024.5}}},"expectedInstancePointer":"/flows/main/maxRecordBytes"},
+    {"name":"Flow maxRecordBytes rejects None","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":null}}},"expectedInstancePointer":"/flows/main/maxRecordBytes"},
+    {"name":"Flow maxRecordBytes rejects '1024'","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":"1024"}}},"expectedInstancePointer":"/flows/main/maxRecordBytes"},
+    {"name":"Flow maxRecordBytes rejects 18446744073709551616","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":18446744073709551616}}},"expectedInstancePointer":"/flows/main/maxRecordBytes"},
+    {"name": "Resource limits must be an object", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": null}, "expectedInstancePointer": "/resourceLimits"},
+    {"name": "Unknown resource limit", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"ioBytes": 1}}, "expectedInstancePointer": "/resourceLimits"},
+    {"name": "CPU limit must be a number", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"cpu": "1"}}, "expectedInstancePointer": "/resourceLimits/cpu"},
+    {"name": "CPU limit must be positive", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"cpu": 0}}, "expectedInstancePointer": "/resourceLimits/cpu"},
+    {"name": "CPU limit must not be negative", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"cpu": -1}}, "expectedInstancePointer": "/resourceLimits/cpu"},
+    {"name": "CPU limit uses hundredths of a core", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"cpu": 0.015}}, "expectedInstancePointer": "/resourceLimits/cpu"},
+    {"name": "CPU limit must fit microsecond representation", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"cpu": 184467440737096}}, "expectedInstancePointer": "/resourceLimits/cpu"},
+    {"name": "Memory limit must be positive", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"memoryBytes": 0}}, "expectedInstancePointer": "/resourceLimits/memoryBytes"},
+    {"name": "Memory limit must not be negative", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"memoryBytes": -1}}, "expectedInstancePointer": "/resourceLimits/memoryBytes"},
+    {"name": "Memory limit must be an integer", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"memoryBytes": 1.5}}, "expectedInstancePointer": "/resourceLimits/memoryBytes"},
+    {"name": "Memory limit must fit u64", "document": {"specVersion": "1", "id": "resource-limits", "pluginInstances": {"device": {"programName": "com.example.device", "exactVersion": "1.0.0", "config": {}}}, "flows": {"main": {"source": "device", "process": {"script": "function main(event) emit() end"}, "sinks": ["device"]}}, "resourceLimits": {"memoryBytes": 18446744073709551616}}, "expectedInstancePointer": "/resourceLimits/memoryBytes"},
+    {
+      "name": "Document requires an explicit DSL version",
+      "expectedInstancePointer": "",
+      "document": {
+        "id": "missing-version",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.device",
+            "exactVersion": "1.0.0",
+            "config": null
+          }
+        },
+        "flows": {
+          "self": {
+            "parallelism": 1.0,
+            "source": "device",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "device"
+            ],
+            "delivery": "at-most-once"
+          }
+        }
+      }
+    },
+    {
+      "name": "Document DSL version must be a string",
+      "expectedInstancePointer": "/specVersion",
+      "document": {
+        "specVersion": 1,
+        "id": "numeric-version",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.device",
+            "exactVersion": "1.0.0",
+            "config": null
+          }
+        },
+        "flows": {
+          "self": {
+            "parallelism": 1.0,
+            "source": "device",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "device"
+            ],
+            "delivery": "at-most-once"
+          }
+        }
+      }
+    },
+    {
+      "name": "Runner rejects an unsupported Document DSL version",
+      "expectedInstancePointer": "/specVersion",
+      "document": {
+        "specVersion": "2",
+        "id": "unsupported-version",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.device",
+            "exactVersion": "1.0.0",
+            "config": null
+          }
+        },
+        "flows": {
+          "self": {
+            "parallelism": 1.0,
+            "source": "device",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "device"
+            ],
+            "delivery": "at-most-once"
+          }
+        }
+      }
+    },
+    {
+      "name": "Plugin Instances cannot be empty",
+      "expectedInstancePointer": "/pluginInstances",
+      "document": {
+        "specVersion": "1",
+        "id": "empty-instances",
+        "pluginInstances": {},
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "missing",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "missing"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Flows cannot be empty",
+      "expectedInstancePointer": "/flows",
+      "document": {
+        "specVersion": "1",
+        "id": "empty-flows",
+        "pluginInstances": {
+          "only": {
+            "programName": "com.example.only",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {}
+      }
+    },
+    {
+      "name": "Flow requires at least one Sink Instance",
+      "expectedInstancePointer": "/flows/main/sinks",
+      "document": {
+        "specVersion": "1",
+        "id": "empty-sinks",
+        "pluginInstances": {
+          "a": {
+            "programName": "com.example.a",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "a",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": []
+          }
+        }
+      }
+    },
+    {
+      "name": "Flow rejects duplicate Sink Instance references",
+      "expectedInstancePointer": "/flows/main/sinks",
+      "document": {
+        "specVersion": "1",
+        "id": "duplicate-sinks",
+        "pluginInstances": {
+          "a": {
+            "programName": "com.example.a",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "a",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "a",
+              "a"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Legacy single-Flow fields are forbidden",
+      "expectedInstancePointer": "",
+      "document": {
+        "specVersion": "1",
+        "id": "legacy",
+        "source": {
+          "programName": "com.example.source",
+          "exactVersion": "1.0.0",
+          "queueCount": 1,
+          "config": {}
+        },
+        "process": {
+          "source": "function main(event) end"
+        },
+        "sinks": [],
+        "pluginInstances": {
+          "a": {
+            "programName": "com.example.a",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "a",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "a"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Legacy Source queueCount is forbidden",
+      "document": {
+        "specVersion": "1",
+        "id": "missing-count",
+        "pluginInstances": {
+          "a": {
+            "programName": "com.example.a",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "source": {
+              "plugin": "a",
+              "queueCount": 1
+            },
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "a"
+            ]
+          }
+        }
+      },
+      "expectedInstancePointer": "/flows/main/source"
+    },
+    {
+      "name": "Parallelism belongs to Flow rather than Source",
+      "document": {
+        "specVersion": "1",
+        "id": "missing-count",
+        "pluginInstances": {
+          "a": {
+            "programName": "com.example.a",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "source": {
+              "plugin": "a",
+              "parallelism": 1
+            },
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "a"
+            ]
+          }
+        }
+      },
+      "expectedInstancePointer": "/flows/main/source"
+    },
+    {
+      "name": "Flow parallelism must be positive",
+      "document": {
+        "specVersion": "1",
+        "id": "missing-count",
+        "pluginInstances": {
+          "a": {
+            "programName": "com.example.a",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "source": "a",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "a"
+            ],
+            "parallelism": 0
+          }
+        }
+      },
+      "expectedInstancePointer": "/flows/main/parallelism"
+    },
+    {
+      "name": "Flow parallelism must be at most ten",
+      "document": {
+        "specVersion": "1",
+        "id": "missing-count",
+        "pluginInstances": {
+          "a": {
+            "programName": "com.example.a",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "source": "a",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "a"
+            ],
+            "parallelism": 10.0001
+          }
+        }
+      },
+      "expectedInstancePointer": "/flows/main/parallelism"
+    },
+    {
+      "name": "Flow parallelism rejects oversized multipliers",
+      "document": {
+        "specVersion": "1",
+        "id": "missing-count",
+        "pluginInstances": {
+          "a": {
+            "programName": "com.example.a",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "source": "a",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "a"
+            ],
+            "parallelism": 2147483648
+          }
+        }
+      },
+      "expectedInstancePointer": "/flows/main/parallelism"
+    },
+    {
+      "name": "Flow parallelism cannot be null",
+      "document": {
+        "specVersion": "1",
+        "id": "missing-count",
+        "pluginInstances": {
+          "a": {
+            "programName": "com.example.a",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "source": "a",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "a"
+            ],
+            "parallelism": null
+          }
+        }
+      },
+      "expectedInstancePointer": "/flows/main/parallelism"
+    },
+    {
+      "name": "Delivery object is rejected",
+      "document": {
+        "specVersion": "1",
+        "id": "factory-uplink",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.modbus",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "cloud": {
+            "programName": "com.example.kafka",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "telemetry": {
+            "parallelism": 1,
+            "source": "device",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "cloud"
+            ],
+            "delivery": {}
+          }
+        }
+      },
+      "expectedInstancePointer": "/flows/telemetry/delivery"
+    },
+    {
+      "name": "Unknown delivery is rejected",
+      "document": {
+        "specVersion": "1",
+        "id": "factory-uplink",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.modbus",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "cloud": {
+            "programName": "com.example.kafka",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "telemetry": {
+            "parallelism": 1,
+            "source": "device",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "cloud"
+            ],
+            "delivery": "exactly-once"
+          }
+        }
+      },
+      "expectedInstancePointer": "/flows/telemetry/delivery"
+    },
+    {
+      "name": "Null delivery is rejected",
+      "document": {
+        "specVersion": "1",
+        "id": "factory-uplink",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.modbus",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "cloud": {
+            "programName": "com.example.kafka",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "telemetry": {
+            "parallelism": 1,
+            "source": "device",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "cloud"
+            ],
+            "delivery": null
+          }
+        }
+      },
+      "expectedInstancePointer": "/flows/telemetry/delivery"
+    }
+  ]
+}

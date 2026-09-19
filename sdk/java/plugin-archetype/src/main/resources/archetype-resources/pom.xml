@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.outputTimestamp>2000-01-01T00:00:00Z</project.build.outputTimestamp>
+        <maven.compiler.release>@maven.compiler.release@</maven.compiler.release>
+        <tenon.java.version>@tenon.java.version@</tenon.java.version>
+        <tenon.maven.version>@tenon.maven.version@</tenon.maven.version>
+        <tenon.version>${tenonVersion}</tenon.version>
+        <tenon.programName>${programName}</tenon.programName>
+        <tenon.displayName>${artifactId}</tenon.displayName>
+        <tenon.description>Example Tenon ${interface} plugin.</tenon.description>
+        <protobuf.version>@protobuf.version@</protobuf.version>
+        <protobuf.maven.plugin.version>@protobuf.maven.plugin.version@</protobuf.maven.plugin.version>
+        <junit.version>@junit.version@</junit.version>
+        <maven.clean.plugin.version>@maven.clean.plugin.version@</maven.clean.plugin.version>
+        <maven.compiler.plugin.version>@maven.compiler.plugin.version@</maven.compiler.plugin.version>
+        <maven.enforcer.plugin.version>@maven.enforcer.plugin.version@</maven.enforcer.plugin.version>
+        <maven.jar.plugin.version>@maven.jar.plugin.version@</maven.jar.plugin.version>
+        <maven.resources.plugin.version>@maven.resources.plugin.version@</maven.resources.plugin.version>
+        <maven.surefire.plugin.version>@maven.surefire.plugin.version@</maven.surefire.plugin.version>
+        <spotless.maven.plugin.version>@spotless.maven.plugin.version@</spotless.maven.plugin.version>
+        <google.java.format.version>@google.java.format.version@</google.java.format.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.bifromq.tenon</groupId>
+            <artifactId>@tenon.archetype.sdk-artifact@</artifactId>
+            <version>${tenon.version}</version>
+        </dependency>
+        <!-- Add @tenon.archetype.direction@ client and protocol compile/runtime dependencies here. The Tenon Maven
+             Plugin includes them in the self-contained Plugin Program bundle. -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven.enforcer.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>enforce-build-toolchain</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>${tenon.java.version}</version>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>${tenon.maven.version}</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven.clean.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>io.github.ascopes</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>${protobuf.maven.plugin.version}</version>
+                <configuration>
+                    <protoc kind="binary-maven">
+                        <version>${protobuf.version}</version>
+                    </protoc>
+                    <embedSourcesInClassOutputs>false</embedSourcesInClassOutputs>
+                    <fatalWarnings>true</fatalWarnings>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-@tenon.archetype.kind@-payload</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>@tenon.archetype.payload-include@</include>
+                            </includes>
+                            <incrementalCompilation>false</incrementalCompilation>
+                            <outputDescriptorFile>
+                                ${project.build.directory}/tenon-contract/payload.descriptor.pb
+                            </outputDescriptorFile>
+                            <outputDescriptorIncludeImports>true</outputDescriptorIncludeImports>
+                            <outputDescriptorIncludeSourceInfo>true</outputDescriptorIncludeSourceInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                        <arg>-Werror</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven.jar.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.resources.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <argLine>--enable-native-access=ALL-UNNAMED</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.maven.plugin.version}</version>
+                <configuration>
+                    <java>
+                        <googleJavaFormat>
+                            <version>${google.java.format.version}</version>
+                        </googleJavaFormat>
+                        <forbidWildcardImports />
+                        <removeUnusedImports />
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-java-format</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.bifromq.tenon</groupId>
+                <artifactId>tenon-maven-plugin</artifactId>
+                <version>${tenon.version}</version>
+                <executions>
+                    <execution>
+                        <id>build-tenon-plugin</id>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <interface>${interface}</interface>
+                            <programName>${tenon.programName}</programName>
+                            <displayName>${tenon.displayName}</displayName>
+                            <description>${tenon.description}</description>
+                            <mainClass>${package}.Main</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,227 @@
+{
+  "valid": [
+    {
+      "name": "Multiple Flows may share one Sink Instance",
+      "document": {
+        "specVersion": "1",
+        "id": "fan-in",
+        "pluginInstances": {
+          "first": {
+            "programName": "com.example.first",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "second": {
+            "programName": "com.example.second",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "shared": {
+            "programName": "com.example.shared",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "first-flow": {
+            "parallelism": 1,
+            "source": "first",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "shared"
+            ]
+          },
+          "second-flow": {
+            "parallelism": 1,
+            "source": "second",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "shared"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "name": "Flow Source reference must resolve",
+      "expectedIssues": [
+        {
+          "code": "flow.source_reference_invalid",
+          "instancePath": "/flows/main/source"
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "missing-source",
+        "pluginInstances": {
+          "sink": {
+            "programName": "com.example.sink",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "missing",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "sink"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Flow Sink reference must resolve",
+      "expectedIssues": [
+        {
+          "code": "flow.sink_reference_invalid",
+          "instancePath": "/flows/main/sinks/0"
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "missing-sink",
+        "pluginInstances": {
+          "source": {
+            "programName": "com.example.source",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "source",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "missing"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "One Source interface cannot feed two Flows",
+      "expectedIssues": [
+        {
+          "code": "flow.source_reused",
+          "instancePath": "/flows/second/source"
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "source-reused",
+        "pluginInstances": {
+          "both": {
+            "programName": "com.example.both",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "first": {
+            "parallelism": 1,
+            "source": "both",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "both"
+            ]
+          },
+          "second": {
+            "parallelism": 1,
+            "source": "both",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "both"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Every Plugin Instance must be used",
+      "expectedIssues": [
+        {
+          "code": "plugin_instance.unused",
+          "instancePath": "/pluginInstances/unused"
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "unused-instance",
+        "pluginInstances": {
+          "used": {
+            "programName": "com.example.used",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "unused": {
+            "programName": "com.example.unused",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "used",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "used"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Plugin Instance id enforces UTF-8 byte limit",
+      "expectedIssues": [
+        {
+          "code": "identifier.too_long",
+          "instancePath": "/pluginInstances/😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "long-instance",
+        "pluginInstances": {
+          "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀": {
+            "programName": "com.example.long",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+            "process": {
+              "script": "function main(event) end"
+            },
+            "sinks": [
+              "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

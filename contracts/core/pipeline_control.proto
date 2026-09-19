@@ -1,0 +1,237 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+syntax = "proto3";
+
+package tenon.core;
+
+// Carries the only Pipeline-to-Runner messages allowed on the correctness stream.
+message PipelineToRunner {
+  oneof message {
+    PipelineAttach attach = 1;
+    PipelineStatusSnapshot status_snapshot = 2;
+  }
+}
+
+// Carries the only Runner-to-Pipeline messages allowed on the correctness stream.
+message RunnerToPipeline {
+  oneof message {
+    PipelineBootstrap bootstrap = 1;
+    PipelineRevisionPlan revision_plan = 2;
+  }
+}
+
+// Binds one new control stream to the exact Pipeline child launch expected by Runner.
+message PipelineAttach {
+  bytes launch_id = 1;
+}
+
+// Supplies the complete immutable inputs for one Pipeline launch.
+message PipelineBootstrap {
+  PipelineRevisionPlan revision_plan = 1;
+  PipelineEnvironment environment = 2;
+}
+
+// Supplies one complete Runtime-Integrity-passed Document and each selected Program once.
+message PipelineRevisionPlan {
+  string document_etag = 1;
+  string tenon_document_json = 2;
+  repeated PluginProgramRuntime plugin_programs = 3;
+}
+
+// Names the exact closed interface capability implemented by a Plugin Program.
+enum PluginInterface {
+  PLUGIN_INTERFACE_SOURCE = 0;
+  PLUGIN_INTERFACE_SINK = 1;
+  PLUGIN_INTERFACE_SOURCE_AND_SINK = 2;
+}
+
+// Defines one immutable installed Program selected by this Pipeline revision.
+message PluginProgramRuntime {
+  string program_name = 1;
+  string exact_version = 2;
+  string program_directory = 3;
+  repeated string command = 4;
+  PluginInterface plugin_interface = 5;
+  bytes payload_descriptor_set = 6;
+}
+
+// Defines the immutable Runner environment values consumed by this Pipeline.
+message PipelineEnvironment {
+  string pipeline_working_directory = 3;
+  LuaLimits lua_limits = 5;
+  RetryBackoff retry_backoff = 6;
+  uint64 reconfigure_timeout_ms = 7;
+  optional string metrics_node_id = 8;
+  uint32 available_cpu_count = 9;
+}
+
+message LuaLimits {
+  uint64 cpu_time_limit_ms = 1;
+  uint64 memory_limit_bytes = 2;
+}
+
+// Defines the shared exponential backoff used by Plugin Instance supervision.
+message RetryBackoff {
+  uint64 initial_delay_ms = 1;
+  uint64 maximum_delay_ms = 2;
+}
+
+// Reports one structurally applied revision and every Plugin Instance's current process state.
+message PipelineStatusSnapshot {
+  string document_etag = 1;
+  repeated PluginInstanceStatus plugin_instances = 2;
+}
+
+// Reports the single lifecycle state owned by one configured Plugin Instance.
+message PluginInstanceStatus {
+  string id = 1;
+  PluginInstanceState state = 2;
+  optional ControlError last_error = 3;
+}
+
+enum PluginInstanceState {
+  PLUGIN_INSTANCE_STATE_STARTING = 0;
+  PLUGIN_INSTANCE_STATE_RUNNING = 1;
+  PLUGIN_INSTANCE_STATE_START_FAILED = 2;
+  PLUGIN_INSTANCE_STATE_RESTART_BACKOFF = 3;
+}
+
+message ControlError {
+  string code = 1;
+  string message = 2;
+}
+
+// Carries one Pipeline's independent best-effort diagnostic stream.
+message PipelineDiagnosticsToRunner {
+  oneof message {
+    PipelineDiagnosticsAttach attach = 1;
+    PipelineDiagnosticBatch batch = 2;
+  }
+}
+
+// Carries the latest diagnostic interest selected by Runner subscribers.
+message RunnerToPipelineDiagnostics {
+  PipelineDiagnosticsInterest interest = 1;
+}
+
+// Binds one diagnostic stream to the exact Pipeline child launch expected by Runner.
+message PipelineDiagnosticsAttach {
+  bytes launch_id = 1;
+}
+
+// Selects exact Flow Channels and Plugin Instances currently observed by subscribers.
+message PipelineDiagnosticsInterest {
+  repeated FlowChannelDiagnosticSelector channels = 1;
+  repeated string plugin_instance_ids = 2;
+}
+
+// Selects one exact Flow-owned Channel.
+message FlowChannelDiagnosticSelector {
+  string flow_id = 1;
+  uint32 channel_index = 2;
+}
+
+// Batches already rendered diagnostic records without affecting correctness control.
+message PipelineDiagnosticBatch {
+  repeated PipelineDiagnosticRecord records = 1;
+}
+
+message PipelineDiagnosticRecord {
+  oneof record {
+    ChannelDiagnosticRecord channel = 1;
+    PluginDiagnosticRecord plugin = 2;
+  }
+}
+
+// Describes one line rendered by one exact Flow Channel incarnation.
+message ChannelDiagnosticRecord {
+  string flow_id = 1;
+  uint32 channel_index = 2;
+  uint64 channel_instance_id = 3;
+  uint64 observed_at_unix_millis = 4;
+  string text = 5;
+  bool truncated = 6;
+  bool invalid_utf8 = 7;
+  uint64 sequence = 8;
+  uint64 lua_vm_instance_id = 9;
+  ChannelDiagnosticKind kind = 10;
+  string phase = 11;
+  string code = 12;
+}
+
+// Separates one Channel's Lua print output from one observed runtime failure.
+enum ChannelDiagnosticKind {
+  CHANNEL_DIAGNOSTIC_KIND_PRINT = 0;
+  CHANNEL_DIAGNOSTIC_KIND_ERROR = 1;
+}
+
+// Describes one stdout or stderr line from one exact Plugin Instance process incarnation.
+message PluginDiagnosticRecord {
+  string plugin_instance_id = 1;
+  uint64 plugin_process_instance_id = 2;
+  uint64 observed_at_unix_millis = 3;
+  string text = 4;
+  bool truncated = 5;
+  bool invalid_utf8 = 6;
+  uint64 sequence = 7;
+  PluginDiagnosticStream stream = 8;
+}
+
+enum PluginDiagnosticStream {
+  PLUGIN_DIAGNOSTIC_STREAM_STDOUT = 0;
+  PLUGIN_DIAGNOSTIC_STREAM_STDERR = 1;
+}
+
+// Opens the only long-lived bidirectional correctness stream for one Pipeline.
+service PipelineControl {
+  rpc Run(stream PipelineToRunner) returns (stream RunnerToPipeline);
+}
+
+// Opens a best-effort stream independent from Pipeline correctness control.
+service PipelineDiagnostics {
+  rpc Stream(stream PipelineDiagnosticsToRunner) returns (stream RunnerToPipelineDiagnostics);
+}
+
+
+// Carries one Pipeline's independent pull metrics stream.
+message PipelineMetricsToRunner {
+  oneof message {
+    PipelineMetricsAttach attach = 1;
+    PipelineMetricsSnapshot snapshot = 2;
+  }
+}
+
+message PipelineMetricsAttach {
+  bytes launch_id = 1;
+}
+
+// Returns one complete standard OpenTelemetry MetricsData protobuf.
+message PipelineMetricsSnapshot {
+  bytes metrics = 1;
+}
+
+message RunnerToPipelineMetrics {
+  repeated string include = 1;
+}
+
+// Opens a best-effort pull stream independent from correctness and diagnostics.
+service PipelineMetrics {
+  rpc Stream(stream PipelineMetricsToRunner) returns (stream RunnerToPipelineMetrics);
+}

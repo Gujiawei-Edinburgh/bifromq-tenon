@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Replace required and properties with stable downstream connection and delivery configuration. Do not define per-record business data or defaults here.",
+  "title": "Example Sink configuration",
+  "description": "Replace this schema with the configuration accepted by the Sink implementation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "outputFile"
+  ],
+  "properties": {
+    "outputFile": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The absolute file path that receives one example message per line."
+    }
+  }
+}

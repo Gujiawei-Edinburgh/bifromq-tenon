@@ -1,0 +1,115 @@
+{
+  "formatVersion": 1,
+  "valid": [
+    {
+      "name": "Metrics attach binds the launch",
+      "direction": "pipelineToRunner",
+      "messageKind": "attach",
+      "encoded": [
+        10,
+        10,
+        10,
+        8,
+        108,
+        97,
+        117,
+        110,
+        99,
+        104,
+        45,
+        97
+      ]
+    },
+    {
+      "name": "Metrics snapshot can contain no points",
+      "direction": "pipelineToRunner",
+      "messageKind": "snapshot",
+      "encoded": [
+        18,
+        0
+      ]
+    },
+    {
+      "name": "Metrics collect without names selects all",
+      "direction": "runnerToPipeline",
+      "messageKind": "collect",
+      "encoded": []
+    },
+    {
+      "name": "Metrics collect selects original names",
+      "direction": "runnerToPipeline",
+      "messageKind": "collect",
+      "encoded": [
+        10,
+        21,
+        116,
+        101,
+        110,
+        111,
+        110,
+        46,
+        112,
+        105,
+        112,
+        101,
+        108,
+        105,
+        110,
+        101,
+        46,
+        109,
+        101,
+        109,
+        111,
+        114,
+        121,
+        10,
+        24,
+        116,
+        101,
+        110,
+        111,
+        110,
+        46,
+        102,
+        108,
+        111,
+        119,
+        46,
+        105,
+        110,
+        112,
+        117,
+        116,
+        46,
+        114,
+        101,
+        99,
+        111,
+        114,
+        100,
+        115
+      ]
+    }
+  ],
+  "malformed": [
+    {
+      "name": "Metrics truncated attach",
+      "direction": "pipelineToRunner",
+      "encoded": [
+        10,
+        3,
+        10
+      ]
+    },
+    {
+      "name": "Metrics truncated include",
+      "direction": "runnerToPipeline",
+      "encoded": [
+        10,
+        2,
+        97
+      ]
+    }
+  ]
+}

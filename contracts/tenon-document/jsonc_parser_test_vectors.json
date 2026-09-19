@@ -1,0 +1,154 @@
+{
+  "valid": [
+    {
+      "name": "Line and block comments are ignored",
+      "source": "{\n  // leading comment\n  \"id\": \"pipeline-a\",\n  /* nested value */\n  \"config\": {\"enabled\": true}\n}",
+      "expectedJson": {
+        "id": "pipeline-a",
+        "config": {
+          "enabled": true
+        }
+      }
+    },
+    {
+      "name": "Comment markers inside strings remain data",
+      "source": "{\"line\":\"// data\",\"block\":\"/* data */\"}",
+      "expectedJson": {
+        "line": "// data",
+        "block": "/* data */"
+      }
+    },
+    {
+      "name": "Equal field names in separate objects are allowed",
+      "source": "{\"first\":{\"value\":1},\"second\":{\"value\":2}}",
+      "expectedJson": {
+        "first": {
+          "value": 1
+        },
+        "second": {
+          "value": 2
+        }
+      }
+    },
+    {
+      "name": "Any single strict JSON root reaches the later Schema boundary",
+      "source": "true",
+      "expectedJson": true
+    }
+  ],
+  "invalid": [
+    {
+      "name": "Object trailing comma is rejected",
+      "source": "{\"value\":1,}",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Array trailing comma is rejected",
+      "source": "[1,2,]",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Duplicate field is rejected before overwrite",
+      "source": "{\"value\":1,\"value\":2}",
+      "expectedErrorCode": "tenon_document.object_field_duplicate"
+    },
+    {
+      "name": "Escaped duplicate field is rejected after decoding",
+      "source": "{\"value\":1,\"\\u0076alue\":2}",
+      "expectedErrorCode": "tenon_document.object_field_duplicate"
+    },
+    {
+      "name": "Nested duplicate field is rejected",
+      "source": "{\"nested\":{\"value\":1,\"value\":2}}",
+      "expectedErrorCode": "tenon_document.object_field_duplicate"
+    },
+    {
+      "name": "Loose object key is rejected",
+      "source": "{value:1}",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Missing comma is rejected",
+      "source": "{\"first\":1 \"second\":2}",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Single quoted string is rejected",
+      "source": "{'value':1}",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Hexadecimal number is rejected",
+      "source": "{\"value\":0x10}",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Unary plus number is rejected",
+      "source": "{\"value\":+1}",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Leading zero number is rejected",
+      "source": "{\"value\":01}",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Incomplete decimal number is rejected",
+      "source": "{\"value\":1.}",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Non-finite number word is rejected",
+      "source": "{\"value\":NaN}",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Shell comment is rejected",
+      "source": "{\"value\":1} # comment",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Additional root value is rejected",
+      "source": "{} {}",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Comment-only document is rejected",
+      "source": "// no value",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Unterminated block comment is rejected",
+      "source": "{\"value\":1} /*",
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    },
+    {
+      "name": "Non-UTF-8 input is rejected",
+      "sourceBytes": [
+        123,
+        34,
+        118,
+        97,
+        108,
+        117,
+        101,
+        34,
+        58,
+        255,
+        125
+      ],
+      "expectedErrorCode": "tenon_document.utf8_invalid"
+    },
+    {
+      "name": "UTF-8 BOM is rejected by JSON syntax",
+      "sourceBytes": [
+        239,
+        187,
+        191,
+        123,
+        125
+      ],
+      "expectedErrorCode": "tenon_document.json_syntax_invalid"
+    }
+  ]
+}

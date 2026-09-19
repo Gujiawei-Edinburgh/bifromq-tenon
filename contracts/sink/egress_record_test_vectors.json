@@ -1,0 +1,36 @@
+{
+  "valid": [
+    {
+      "name": "Empty payload remains a nonempty Queue record",
+      "payload": [],
+      "encoded": [10, 0]
+    },
+    {
+      "name": "Instance-owned Egress record with binary payload",
+      "payload": [
+        0,
+        127,
+        128,
+        255
+      ],
+      "encoded": [
+        10,
+        4,
+        0,
+        127,
+        128,
+        255
+      ]
+    }
+  ],
+  "malformed": [
+    {
+      "name": "Truncated payload",
+      "encoded": [
+        10,
+        2,
+        1
+      ]
+    }
+  ]
+}

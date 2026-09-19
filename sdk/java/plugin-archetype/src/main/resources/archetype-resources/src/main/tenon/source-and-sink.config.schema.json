@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Replace required and properties with configuration for the one owner shared by Source and Sink. Do not define per-record business data or defaults here.",
+  "title": "Example Source and Sink configuration",
+  "description": "Replace this schema with the configuration accepted by the shared Source and Sink owner.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "message",
+    "queueIndex",
+    "outputFile"
+  ],
+  "properties": {
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The example payload published when the Source starts."
+    },
+    "queueIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647,
+      "description": "The example ordered Pipeline channel. It must be less than Flow parallelism."
+    },
+    "outputFile": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The absolute file path that receives one example Sink message per line."
+    }
+  }
+}

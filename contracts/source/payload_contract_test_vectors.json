@@ -1,0 +1,59 @@
+{
+  "formatVersion": 1,
+  "valid": [
+    {
+      "name": "Source Payload Contract with a helper message",
+      "files": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\n\npackage com.example.modbus;\n\nmessage SourceRecordPayload {\n  string device_id = 1;\n  repeated uint32 registers = 2;\n}\n\nmessage DeviceMetadata {\n  string site = 1;\n}\n"
+        }
+      ],
+      "entryFiles": [
+        "source_record_payload.proto"
+      ],
+      "expectedRootMessage": "com.example.modbus.SourceRecordPayload"
+    },
+    {
+      "name": "Source root can use any descriptor file name",
+      "files": [
+        {
+          "name": "payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SourceRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "payload.proto"
+      ],
+      "expectedRootMessage": "SourceRecordPayload"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "Source Payload Contract root message is missing",
+      "files": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage DevicePayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "source_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.source_root_missing"
+    },
+    {
+      "name": "Nested SourceRecordPayload is not the root message",
+      "files": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage Envelope {\n  message SourceRecordPayload {}\n}\n"
+        }
+      ],
+      "entryFiles": [
+        "source_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.source_root_missing"
+    }
+  ]
+}

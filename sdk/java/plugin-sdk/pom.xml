@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.apache.bifromq.tenon</groupId>
+        <artifactId>tenon-java-build</artifactId>
+        <version>0.1.0</version>
+    </parent>
+
+    <artifactId>tenon-plugin-sdk</artifactId>
+    <name>Tenon Plugin SDK</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.bifromq.tenon</groupId>
+            <artifactId>tenon-ipc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.bifromq.tenon</groupId>
+            <artifactId>tenon-ipc</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven.shade.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>embed-internal-ipc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>org.apache.bifromq.tenon:tenon-ipc</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>org.apache.bifromq.tenon:tenon-ipc</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>META-INF/NOTICE</exclude>
+                                        <exclude>META-INF/DISCLAIMER</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <useDependencyReducedPomInJar>true</useDependencyReducedPomInJar>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>flatten-consumer-pom</id>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.github.ascopes</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-plugin-contracts</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectories>
+                                <sourceDirectory>
+                                    ${maven.multiModuleProjectDirectory}/../../contracts/plugin
+                                </sourceDirectory>
+                                <sourceDirectory>
+                                    ${maven.multiModuleProjectDirectory}/../../contracts/source
+                                </sourceDirectory>
+                                <sourceDirectory>
+                                    ${maven.multiModuleProjectDirectory}/../../contracts/sink
+                                </sourceDirectory>
+                            </sourceDirectories>
+                            <includes>
+                                <include>process_control.proto</include>
+                                <include>ingress_record.proto</include>
+                                <include>egress_record.proto</include>
+                            </includes>
+                            <plugins>
+                                <plugin kind="binary-maven">
+                                    <groupId>io.grpc</groupId>
+                                    <artifactId>protoc-gen-grpc-java</artifactId>
+                                    <version>${grpc.version}</version>
+                                </plugin>
+                            </plugins>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-test-payload-contract</id>
+                        <goals>
+                            <goal>generate-test</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectories>
+                                <sourceDirectory>
+                                    ${maven.multiModuleProjectDirectory}/../../contracts/sink/test-fixtures
+                                </sourceDirectory>
+                            </sourceDirectories>
+                            <includes>
+                                <include>sink_record_payload.proto</include>
+                            </includes>
+                            <outputDirectory>
+                                ${project.build.directory}/generated-test-sources/protobuf
+                            </outputDirectory>
+                            <incrementalCompilation>false</incrementalCompilation>
+                            <outputDescriptorFile>
+                                ${project.build.directory}/contract-fixture/payload.descriptor.pb
+                            </outputDescriptorFile>
+                            <outputDescriptorIncludeImports>true</outputDescriptorIncludeImports>
+                            <outputDescriptorIncludeSourceInfo>
+                                true
+                            </outputDescriptorIncludeSourceInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build.helper.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>register-generated-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>
+                                    ${project.build.directory}/generated-test-sources/protobuf
+                                </source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <tenon.test.payload.descriptor>
+                            ${project.build.directory}/contract-fixture/payload.descriptor.pb
+                        </tenon.test.payload.descriptor>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

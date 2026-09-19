@@ -1,0 +1,1645 @@
+{
+  "valid": [
+    {
+      "name": "Source-only Plugin Program manifest",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Sink-only Plugin Program prerelease manifest",
+      "manifest": {
+        "programName": "com.example.kafka",
+        "exactVersion": "2.0.0-rc.1",
+        "interface": "sink",
+        "command": [
+          "./bin/start"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Dual-interface Plugin Program manifest",
+      "manifest": {
+        "programName": "com.example.gateway",
+        "exactVersion": "1.2.3",
+        "interface": "source-and-sink",
+        "command": [
+          "./bin/start"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "All four supported platform pairs",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "linux",
+            "architecture": "arm64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "displayName minimum",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "A",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "displayName maximum",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "displayName unicode maximum",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界😀",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "displayName supplementary maximum",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "displayName literal markup",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "<b>Example</b>",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "displayName spaces preserved",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": " Example ",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "description minimum",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "A"
+      }
+    },
+    {
+      "name": "description maximum",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    },
+    {
+      "name": "description unicode maximum",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界😀"
+      }
+    },
+    {
+      "name": "description supplementary maximum",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      }
+    },
+    {
+      "name": "description literal markup",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "<b>Example</b>"
+      }
+    },
+    {
+      "name": "description spaces preserved",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": " Example "
+      }
+    },
+    {
+      "name": "description paragraphs",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read records.\r\nWrite processed records.\nInspect results."
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "name": "Plugin interface is required",
+      "expectedInstancePointer": "",
+      "manifest": {
+        "programName": "com.example.invalid",
+        "exactVersion": "1.0.0",
+        "command": [
+          "./bin/start"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Plugin interface rejects an array",
+      "expectedInstancePointer": "/interface",
+      "manifest": {
+        "programName": "com.example.invalid",
+        "exactVersion": "1.0.0",
+        "interface": [],
+        "command": [
+          "./bin/start"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Legacy Plugin interfaces array is forbidden",
+      "expectedInstancePointer": "",
+      "manifest": {
+        "programName": "com.example.invalid",
+        "exactVersion": "1.0.0",
+        "interface": "source-and-sink",
+        "interfaces": [
+          "source",
+          "sink"
+        ],
+        "command": [
+          "./bin/start"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Unknown Plugin interface",
+      "expectedInstancePointer": "/interface",
+      "manifest": {
+        "programName": "com.example.invalid",
+        "exactVersion": "1.0.0",
+        "interface": "processor",
+        "command": [
+          "./bin/start"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Legacy Plugin kind is forbidden",
+      "expectedInstancePointer": "",
+      "manifest": {
+        "kind": "source",
+        "programName": "com.example.invalid",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "./bin/start"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Legacy Plugin files declaration is forbidden",
+      "expectedInstancePointer": "",
+      "manifest": {
+        "programName": "com.example.invalid",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "./bin/start"
+        ],
+        "files": {
+          "config.schema.json": "1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Launch command is empty",
+      "expectedInstancePointer": "/command",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Launch command uses the reserved startup option",
+      "expectedInstancePointer": "/command/1",
+      "manifest": {
+        "programName": "com.example.kafka",
+        "exactVersion": "1.0.0",
+        "interface": "sink",
+        "command": [
+          "./bin/start",
+          "--sdk-config"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Platform declaration is required",
+      "expectedInstancePointer": "",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      }
+    },
+    {
+      "name": "Empty platform set",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms"
+    },
+    {
+      "name": "Null platform set",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": null,
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms"
+    },
+    {
+      "name": "Platform string",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          "linux/amd64"
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms/0"
+    },
+    {
+      "name": "Missing architecture",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms/0"
+    },
+    {
+      "name": "Missing OS",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "architecture": "amd64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms/0"
+    },
+    {
+      "name": "OS alias",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "macos",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms/0/os"
+    },
+    {
+      "name": "Architecture alias",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "x86_64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms/0/architecture"
+    },
+    {
+      "name": "Wildcard OS",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "*",
+            "architecture": "amd64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms/0/os"
+    },
+    {
+      "name": "Unknown platform field",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64",
+            "variant": "v3"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms/0"
+    },
+    {
+      "name": "Repeated pair with reordered properties",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "architecture": "amd64",
+            "os": "linux"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms"
+    },
+    {
+      "name": "Unsupported operating system is rejected even alongside supported platforms",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          },
+          {
+            "os": "windows",
+            "architecture": "amd64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms/2/os"
+    },
+    {
+      "name": "Unsupported architecture is rejected even alongside supported platforms",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          },
+          {
+            "os": "linux",
+            "architecture": "riscv64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/platforms/2/architecture"
+    },
+    {
+      "name": "displayName missing",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": ""
+    },
+    {
+      "name": "displayName null",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": null,
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName non-string",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": 42,
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName empty",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName whitespace",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "  　",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName too long",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName supplementary too long",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName NUL",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "a\u0000b",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName tab",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "a\tb",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName DEL",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "ab",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName C1",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "ab",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "description missing",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin"
+      },
+      "expectedInstancePointer": ""
+    },
+    {
+      "name": "description null",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": null
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "description non-string",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": 42
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "description empty",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": ""
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "description whitespace",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "  　"
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "description too long",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "description supplementary too long",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "description NUL",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "a\u0000b"
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "description tab",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "a\tb"
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "description DEL",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "ab"
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "description C1",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "ab"
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "displayName line break 0xa",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "a\nb",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName line break 0xd",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "a\rb",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName line break 0x2028",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "a b",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "displayName line break 0x2029",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "a b",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    },
+    {
+      "name": "description blank lines",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example Plugin",
+        "description": "\r\n 　"
+      },
+      "expectedInstancePointer": "/description"
+    },
+    {
+      "name": "displayName trailing line break",
+      "manifest": {
+        "programName": "com.example.modbus",
+        "exactVersion": "1.0.0",
+        "interface": "source",
+        "command": [
+          "java",
+          "-jar",
+          "lib/program.jar"
+        ],
+        "platforms": [
+          {
+            "os": "linux",
+            "architecture": "amd64"
+          },
+          {
+            "os": "darwin",
+            "architecture": "arm64"
+          }
+        ],
+        "displayName": "Example\n",
+        "description": "Read and write example records."
+      },
+      "expectedInstancePointer": "/displayName"
+    }
+  ]
+}

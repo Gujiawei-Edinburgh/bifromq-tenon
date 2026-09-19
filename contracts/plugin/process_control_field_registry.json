@@ -1,0 +1,50 @@
+{
+  "formatVersion": 1,
+  "package": "tenon.plugin",
+  "service": {
+    "name": "PluginLifecycle",
+    "method": "Run",
+    "clientStreaming": true,
+    "serverStreaming": true,
+    "inputType": "PluginToPipeline",
+    "outputType": "PipelineToPlugin"
+  },
+  "messages": {
+    "PluginToPipeline": {
+      "attach": 1,
+      "ready": 2,
+      "source_quiesced": 3
+    },
+    "PipelineToPlugin": {
+      "quiesce_source": 1,
+      "shutdown": 2
+    },
+    "Attach": {
+      "launch_id": 1
+    },
+    "Ready": {},
+    "SourceQuiesced": {},
+    "QuiesceSource": {},
+    "Shutdown": {}
+  },
+  "oneofs": {
+    "PluginToPipeline": {
+      "message": [
+        "attach",
+        "ready",
+        "source_quiesced"
+      ]
+    },
+    "PipelineToPlugin": {
+      "message": [
+        "quiesce_source",
+        "shutdown"
+      ]
+    }
+  },
+  "enums": {},
+  "reservedFieldNumbers": {},
+  "reservedFieldNames": {},
+  "reservedEnumNumbers": {},
+  "reservedEnumNames": {}
+}

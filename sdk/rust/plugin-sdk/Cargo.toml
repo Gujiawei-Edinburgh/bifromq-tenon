@@ -1,0 +1,96 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+[package]
+name = "tenon-plugin-sdk"
+description = "Tenon Rust Plugin author API; Source and Sink runtimes and interface contracts"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+readme = "README.md"
+
+[dependencies]
+tenon-ipc.workspace = true
+base64.workspace = true
+bytes.workspace = true
+futures-util.workspace = true
+hyper.workspace = true
+hyper-util.workspace = true
+jsonc-parser.workspace = true
+prost.workspace = true
+rustix.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tokio.workspace = true
+tokio-stream.workspace = true
+tonic.workspace = true
+tonic-prost.workspace = true
+tower.workspace = true
+tempfile = { workspace = true, optional = true }
+
+[build-dependencies]
+prost-build.workspace = true
+protoc-bin-vendored.workspace = true
+tonic-prost-build.workspace = true
+
+[dev-dependencies]
+tenon-ipc = { workspace = true, features = ["repository-test-support"] }
+loom.workspace = true
+proptest.workspace = true
+prost-types.workspace = true
+tempfile.workspace = true
+tokio = { workspace = true, features = ["test-util", "process"] }
+
+[features]
+repository-test-support = ["tenon-ipc/repository-test-support","tonic/router", "tonic/server", "dep:tempfile"]
+
+[[bin]]
+name = "source-process-fixture"
+path = "tests/support/source_process_fixture.rs"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "source_process"
+path = "tests/source_process.rs"
+required-features = ["repository-test-support"]
+
+[[bin]]
+name = "sink-process-fixture"
+path = "tests/support/sink_process_fixture.rs"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "sink_process"
+path = "tests/sink_process.rs"
+required-features = ["repository-test-support"]
+
+[[bin]]
+name = "source-and-sink-process-fixture"
+path = "tests/support/source_and_sink_process_fixture.rs"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "source_and_sink_process"
+path = "tests/source_and_sink_process.rs"
+required-features = ["repository-test-support"]
+
+[lints]
+workspace = true

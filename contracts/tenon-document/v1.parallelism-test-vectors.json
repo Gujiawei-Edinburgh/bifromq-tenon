@@ -1,0 +1,173 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "name": "Omitted parallelism uses one channel",
+      "parallelism": null,
+      "cpu": null,
+      "availableCpuCount": 8,
+      "channelCount": 1
+    },
+    {
+      "name": "Small ratio uses one channel",
+      "parallelism": "0.01",
+      "cpu": null,
+      "availableCpuCount": 8,
+      "channelCount": 1
+    },
+    {
+      "name": "Unbounded ratio uses startup CPUs",
+      "parallelism": "0.5",
+      "cpu": null,
+      "availableCpuCount": 8,
+      "channelCount": 4
+    },
+    {
+      "name": "Explicit one uses startup CPUs",
+      "parallelism": "1",
+      "cpu": null,
+      "availableCpuCount": 8,
+      "channelCount": 8
+    },
+    {
+      "name": "Omitted ratio ignores CPU basis",
+      "parallelism": null,
+      "cpu": "1.5",
+      "availableCpuCount": 8,
+      "channelCount": 1
+    },
+    {
+      "name": "Half parallelism ignores a two-core time quota",
+      "parallelism": "0.5",
+      "cpu": "2",
+      "availableCpuCount": 8,
+      "channelCount": 4
+    },
+    {
+      "name": "Fractional CPU quota does not reduce channels",
+      "parallelism": "1",
+      "cpu": "1.5",
+      "availableCpuCount": 8,
+      "channelCount": 8
+    },
+    {
+      "name": "Sub-core CPU quota does not reduce channels",
+      "parallelism": "1",
+      "cpu": "0.01",
+      "availableCpuCount": 8,
+      "channelCount": 8
+    },
+    {
+      "name": "CPU quota above the allowed CPU count does not add channels",
+      "parallelism": "1",
+      "cpu": "20",
+      "availableCpuCount": 8,
+      "channelCount": 8
+    },
+    {
+      "name": "Exact integer boundary does not add a channel",
+      "parallelism": "0.56",
+      "cpu": "12.5",
+      "availableCpuCount": 25,
+      "channelCount": 14
+    },
+    {
+      "name": "Ratio just above integer boundary adds a channel",
+      "parallelism": "0.5600000000000000000000000000000000001",
+      "cpu": "12.5",
+      "availableCpuCount": 25,
+      "channelCount": 15
+    },
+    {
+      "name": "Ratio just below integer boundary rounds up",
+      "parallelism": "0.5599999999999999999999999999999999999",
+      "cpu": "12.5",
+      "availableCpuCount": 25,
+      "channelCount": 14
+    },
+    {
+      "name": "Scientific ratio preserves exact boundary",
+      "parallelism": "56e-2",
+      "cpu": "12.5",
+      "availableCpuCount": 25,
+      "channelCount": 14
+    },
+    {
+      "name": "Positive exponent preserves exact boundary",
+      "parallelism": "0.000056e4",
+      "cpu": "12.5",
+      "availableCpuCount": 25,
+      "channelCount": 14
+    },
+    {
+      "name": "Tiny positive ratio still creates one channel",
+      "parallelism": "1e-300",
+      "cpu": "1.5",
+      "availableCpuCount": 8,
+      "channelCount": 1
+    },
+    {
+      "name": "Equivalent explicit ratio preserves exact boundary",
+      "parallelism": "1.0e0",
+      "cpu": "1.5",
+      "availableCpuCount": 8,
+      "channelCount": 8
+    },
+    {
+      "name": "Leading zeros cancel the scientific exponent without inflating work",
+      "parallelism": "0.0000000000000000000000000000000000000001e40",
+      "cpu": null,
+      "availableCpuCount": 8,
+      "channelCount": 8
+    },
+    {
+      "name": "Multiplier above one ignores a sub-core time quota",
+      "parallelism": "2",
+      "cpu": "0.5",
+      "availableCpuCount": 4,
+      "channelCount": 8
+    },
+    {
+      "name": "Fractional multiplier rounds up once",
+      "parallelism": "1.125",
+      "cpu": "0.01",
+      "availableCpuCount": 4,
+      "channelCount": 5
+    },
+    {
+      "name": "Upper multiplier uses ten times the allowed CPUs",
+      "parallelism": "10",
+      "cpu": "1.5",
+      "availableCpuCount": 8,
+      "channelCount": 80
+    },
+    {
+      "name": "Upper multiplier in decimal notation",
+      "parallelism": "10.0",
+      "cpu": null,
+      "availableCpuCount": 8,
+      "channelCount": 80
+    },
+    {
+      "name": "Upper multiplier with a positive exponent",
+      "parallelism": "1e1",
+      "cpu": "0.01",
+      "availableCpuCount": 8,
+      "channelCount": 80
+    },
+    {
+      "name": "Multiplier just above an integer boundary adds a channel",
+      "parallelism": "1.5000000000000000000000000000000000001",
+      "cpu": "0.5",
+      "availableCpuCount": 4,
+      "channelCount": 7
+    },
+    {
+      "name": "Positive exponent cancels leading fractional zeros at the upper bound",
+      "parallelism": "0.0000000000000000000000000000000000000001e41",
+      "cpu": null,
+      "availableCpuCount": 8,
+      "channelCount": 80
+    }
+  ]
+}

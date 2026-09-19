@@ -1,0 +1,55 @@
+{
+  "formatVersion": 1,
+  "valid": [
+    {
+      "name": "Ingress record with an empty payload",
+      "recordId": 1,
+      "payload": [],
+      "encoded": [8, 1]
+    },
+    {
+      "name": "Ingress record with arbitrary binary payload",
+      "recordId": 123,
+      "payload": [0, 1, 255],
+      "encoded": [8, 123, 18, 3, 0, 1, 255]
+    }
+  ],
+  "completionValid": [
+    {
+      "name": "Successful Ingress completion",
+      "recordId": 123,
+      "status": "OK",
+      "encoded": [8, 123, 16, 1]
+    },
+    {
+      "name": "Retryable Ingress completion",
+      "recordId": 124,
+      "status": "RETRY",
+      "encoded": [8, 124, 16, 2]
+    },
+    {
+      "name": "Backpressured Ingress completion",
+      "recordId": 125,
+      "status": "BACKPRESSURE",
+      "encoded": [8, 125, 16, 3]
+    },
+    {
+      "name": "Failed Ingress completion",
+      "recordId": 126,
+      "status": "ERROR",
+      "encoded": [8, 126, 16, 4]
+    },
+    {
+      "name": "Maximum Ingress completion fixes the capacity boundary",
+      "recordId": 18446744073709551615,
+      "status": "ERROR",
+      "encoded": [8, 255, 255, 255, 255, 255, 255, 255, 255, 255, 1, 16, 4]
+    }
+  ],
+  "malformed": [
+    {
+      "name": "Truncated Ingress record payload",
+      "encoded": [8, 1, 18, 2, 0]
+    }
+  ]
+}

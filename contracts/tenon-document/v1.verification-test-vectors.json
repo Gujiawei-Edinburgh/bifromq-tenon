@@ -1,0 +1,82 @@
+{
+  "formatVersion": 1,
+  "valid": [
+    {
+      "name": "Static verification does not require installed Plugin Programs",
+      "document": {
+        "specVersion": "1",
+        "id": "verified-document",
+        "pluginInstances": {
+          "source": {
+            "programName": "com.example.modbus",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "sink": {
+            "programName": "com.example.kafka",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "source",
+            "process": {
+              "script": "local builder = registry:getBuilder(\"com.example.kafka@1.0.0\")\nfunction main(event) emit() end"
+            },
+            "sinks": [
+              "sink"
+            ]
+          }
+        }
+      },
+      "expectedId": "verified-document",
+      "expectedPluginInstanceIds": [
+        "sink",
+        "source"
+      ],
+      "expectedFlowIds": [
+        "main"
+      ]
+    }
+  ],
+  "invalid": [
+    {"name":"Flow rejects unrepresentable maxPendingRecords 2147483647","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxPendingRecords":2147483647}}},"expectedIssues":[{"code":"flow.pending_limit_invalid","instancePath":"/flows/main/maxPendingRecords"}]},
+    {"name":"Flow rejects unrepresentable maxPendingRecords 18446744073709551615","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxPendingRecords":18446744073709551615}}},"expectedIssues":[{"code":"flow.pending_limit_invalid","instancePath":"/flows/main/maxPendingRecords"}]},
+    {"name":"Flow rejects unrepresentable maxRecordBytes 2147483633","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":2147483633}}},"expectedIssues":[{"code":"flow.record_limit_invalid","instancePath":"/flows/main/maxRecordBytes"}]},
+    {"name":"Flow rejects unrepresentable maxRecordBytes 18446744073709551615","document":{"specVersion":"1","id":"flow-limits","pluginInstances":{"both":{"programName":"com.example.both","exactVersion":"1.0.0","config":{}}},"flows":{"main":{"source":"both","process":{"script":"function main(event) emit() end"},"sinks":["both"],"maxRecordBytes":18446744073709551615}}},"expectedIssues":[{"code":"flow.record_limit_invalid","instancePath":"/flows/main/maxRecordBytes"}]},
+    {
+      "name": "Each Flow Lua source is compiled independently",
+      "document": {
+        "specVersion": "1",
+        "id": "invalid-lua",
+        "pluginInstances": {
+          "both": {
+            "programName": "com.example.both",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "both",
+            "process": {
+              "script": "function main(event)"
+            },
+            "sinks": [
+              "both"
+            ]
+          }
+        }
+      },
+      "expectedIssues": [
+        {
+          "code": "process.lua_syntax_invalid",
+          "instancePath": "/flows/main/process/script"
+        }
+      ]
+    }
+  ]
+}

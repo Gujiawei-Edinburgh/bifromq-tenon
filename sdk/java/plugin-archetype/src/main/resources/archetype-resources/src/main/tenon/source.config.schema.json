@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Replace required and properties with stable Source connection and collection configuration. Do not define per-record business data or defaults here.",
+  "title": "Example Source configuration",
+  "description": "Replace this schema with the configuration accepted by the Source implementation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "message",
+    "queueIndex"
+  ],
+  "properties": {
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The example payload published when the Source starts."
+    },
+    "queueIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647,
+      "description": "The example ordered Pipeline channel. It must be less than Flow parallelism."
+    }
+  }
+}

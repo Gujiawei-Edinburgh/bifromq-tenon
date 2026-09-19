@@ -1,0 +1,76 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+[package]
+name = "bifromq-tenon-mqtt-plugin"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97.1"
+license = "Apache-2.0"
+publish = false
+
+[package.metadata.tenon]
+display-name = "MQTT"
+description = "Subscribe to MQTT topics and publish processed messages to MQTT brokers."
+program-name = "org.apache.bifromq.tenon.mqtt"
+interface = "source-and-sink"
+
+[dependencies]
+futures-util.workspace = true
+flume = { version = "=0.12.0", optional = true }
+tenon-plugin-sdk = { path = "../../sdk/rust/plugin-sdk", version = "0.1.0" }
+rumqttc = { package = "rumqttc-v5-next", version = "=0.34.0", default-features = false, features = ["use-rustls-no-provider"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = { version = "=1.0.151", features = ["arbitrary_precision"] }
+tokio = { version = "=1.53.1", default-features = false, features = ["rt", "sync", "time"] }
+tokio-util.workspace = true
+url = "=2.5.7"
+
+[build-dependencies]
+prost-build = "=0.14.4"
+protoc-bin-vendored = "=3.2.0"
+
+[dev-dependencies]
+tenon-ipc.workspace = true
+tenon-plugin-sdk = { path = "../../sdk/rust/plugin-sdk", features = ["repository-test-support"] }
+flume = "=0.12.0"
+bytes.workspace = true
+tokio = { version = "=1.53.1", features = ["macros", "process"] }
+base64.workspace = true
+sha2.workspace = true
+tempfile.workspace = true
+tokio-stream.workspace = true
+tonic.workspace = true
+
+[features]
+repository-test-support = ["tenon-plugin-sdk/repository-test-support", "dep:flume"]
+
+[[example]]
+name = "mqtt-source-process-fixture"
+path = "tests/support/source_process_fixture.rs"
+test = false
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "source_process"
+path = "tests/source_process.rs"
+required-features = ["repository-test-support"]
+
+[[test]]
+name = "mqtt_process"
+path = "tests/mqtt_process.rs"
+required-features = ["repository-test-support"]

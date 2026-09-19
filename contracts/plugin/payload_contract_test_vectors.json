@@ -1,0 +1,200 @@
+{
+  "formatVersion": 1,
+  "valid": [
+    {
+      "name": "Source-only Program exposes one Source Contract projection",
+      "interface": "source",
+      "files": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\npackage com.example.source;\nmessage SourceRecordPayload { string value = 1; }\n"
+        }
+      ],
+      "entryFiles": [
+        "source_record_payload.proto"
+      ],
+      "expectedSourceRootMessage": "com.example.source.SourceRecordPayload",
+      "expectedSinkRootMessage": null
+    },
+    {
+      "name": "Sink-only Program exposes one Sink Contract projection",
+      "interface": "sink",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\npackage com.example.sink;\nmessage SinkRecordPayload { bytes value = 1; }\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedSourceRootMessage": null,
+      "expectedSinkRootMessage": "com.example.sink.SinkRecordPayload"
+    },
+    {
+      "name": "Dual-interface Program exposes independent Source and Sink Contract projections",
+      "interface": "source-and-sink",
+      "files": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\npackage com.example.dual;\nimport \"shared.proto\";\nmessage SourceRecordPayload { Shared value = 1; }\n"
+        },
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\npackage com.example.dual;\nimport \"shared.proto\";\nmessage SinkRecordPayload { Shared value = 1; }\n"
+        },
+        {
+          "name": "shared.proto",
+          "content": "syntax = \"proto3\";\npackage com.example.dual;\nmessage Shared { string value = 1; }\n"
+        }
+      ],
+      "entryFiles": [
+        "source_record_payload.proto",
+        "sink_record_payload.proto"
+      ],
+      "expectedSourceRootMessage": "com.example.dual.SourceRecordPayload",
+      "expectedSinkRootMessage": "com.example.dual.SinkRecordPayload"
+    }
+  ],
+  "projectionChanges": [
+    {
+      "name": "Source-only type changes only the Source Contract projection",
+      "interface": "source-and-sink",
+      "beforeFiles": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SourceRecordPayload { string value = 1; }\n"
+        },
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload { string value = 1; }\n"
+        }
+      ],
+      "afterFiles": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SourceRecordPayload { bytes value = 1; }\n"
+        },
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload { string value = 1; }\n"
+        }
+      ],
+      "entryFiles": [
+        "source_record_payload.proto",
+        "sink_record_payload.proto"
+      ],
+      "expectedChangedInterfaces": [
+        "source"
+      ]
+    },
+    {
+      "name": "Shared reachable type changes both Contract projections",
+      "interface": "source-and-sink",
+      "beforeFiles": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\nimport \"shared.proto\";\nmessage SourceRecordPayload { Shared value = 1; }\n"
+        },
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nimport \"shared.proto\";\nmessage SinkRecordPayload { Shared value = 1; }\n"
+        },
+        {
+          "name": "shared.proto",
+          "content": "syntax = \"proto3\";\nmessage Shared { string value = 1; }\n"
+        }
+      ],
+      "afterFiles": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\nimport \"shared.proto\";\nmessage SourceRecordPayload { Shared value = 1; }\n"
+        },
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nimport \"shared.proto\";\nmessage SinkRecordPayload { Shared value = 1; }\n"
+        },
+        {
+          "name": "shared.proto",
+          "content": "syntax = \"proto3\";\nmessage Shared { bytes value = 1; }\n"
+        }
+      ],
+      "entryFiles": [
+        "source_record_payload.proto",
+        "sink_record_payload.proto"
+      ],
+      "expectedChangedInterfaces": [
+        "source",
+        "sink"
+      ]
+    }
+  ],
+  "invalid": [
+    {
+      "name": "Declared Source interface requires SourceRecordPayload",
+      "interface": "source",
+      "files": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage OtherPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "source_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.source_root_missing"
+    },
+    {
+      "name": "Declared Sink interface requires SinkRecordPayload",
+      "interface": "sink",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage OtherPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.sink_root_missing"
+    },
+    {
+      "name": "Undeclared Source root conflicts with the manifest interface",
+      "interface": "sink",
+      "files": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SourceRecordPayload {}\n"
+        },
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "source_record_payload.proto",
+        "sink_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.undeclared_interface_root"
+    },
+    {
+      "name": "Undeclared Sink root conflicts with the manifest interface",
+      "interface": "source",
+      "files": [
+        {
+          "name": "source_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SourceRecordPayload {}\n"
+        },
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "source_record_payload.proto",
+        "sink_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.undeclared_interface_root"
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "valid": [
+    {
+      "name": "Tenon Document identifier preserves surrounding spaces",
+      "kind": "tenonDocumentId",
+      "value": " pipeline-A ",
+      "expected": " pipeline-A "
+    },
+    {
+      "name": "Plugin Instance identifier accepts non-ASCII UTF-8",
+      "kind": "pluginInstanceId",
+      "value": "设备-instance",
+      "expected": "设备-instance"
+    },
+    {
+      "name": "Flow identifier accepts exactly 128 ASCII bytes",
+      "kind": "flowId",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "name": "Program name accepts internal hyphens and digits",
+      "kind": "programName",
+      "value": "io.example.data-hub2",
+      "expected": "io.example.data-hub2"
+    },
+    {
+      "name": "Exact version accepts the zero release",
+      "kind": "exactVersion",
+      "value": "0.0.0",
+      "expected": "0.0.0"
+    },
+    {
+      "name": "Exact version accepts lowercase prerelease identifiers",
+      "kind": "exactVersion",
+      "value": "2.0.0-rc.1",
+      "expected": "2.0.0-rc.1"
+    },
+    {
+      "name": "Exact version accepts numeric components larger than u64",
+      "kind": "exactVersion",
+      "value": "18446744073709551616.0.0",
+      "expected": "18446744073709551616.0.0"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "Tenon Document identifier rejects empty input",
+      "kind": "tenonDocumentId",
+      "value": "",
+      "expectedErrorCode": "identifier.empty"
+    },
+    {
+      "name": "Plugin Instance identifier rejects 129 UTF-8 bytes",
+      "kind": "pluginInstanceId",
+      "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "expectedErrorCode": "identifier.too_long"
+    },
+    {
+      "name": "Flow identifier rejects C0 control characters",
+      "kind": "flowId",
+      "value": "flow\u001fid",
+      "expectedErrorCode": "identifier.control_character"
+    },
+    {
+      "name": "Flow identifier rejects C1 control characters",
+      "kind": "flowId",
+      "value": "flowid",
+      "expectedErrorCode": "identifier.control_character"
+    },
+    {
+      "name": "Program name requires three segments",
+      "kind": "programName",
+      "value": "example.kafka",
+      "expectedErrorCode": "program_name.invalid"
+    },
+    {
+      "name": "Program name rejects uppercase letters",
+      "kind": "programName",
+      "value": "Com.example.kafka",
+      "expectedErrorCode": "program_name.invalid"
+    },
+    {
+      "name": "Program name rejects a leading segment hyphen",
+      "kind": "programName",
+      "value": "com.-example.kafka",
+      "expectedErrorCode": "program_name.invalid"
+    },
+    {
+      "name": "Program name rejects an empty segment",
+      "kind": "programName",
+      "value": "com..kafka",
+      "expectedErrorCode": "program_name.invalid"
+    },
+    {
+      "name": "Exact version requires major minor and patch",
+      "kind": "exactVersion",
+      "value": "1.0",
+      "expectedErrorCode": "exact_version.invalid"
+    },
+    {
+      "name": "Exact version rejects a v prefix",
+      "kind": "exactVersion",
+      "value": "v1.0.0",
+      "expectedErrorCode": "exact_version.invalid"
+    },
+    {
+      "name": "Exact version rejects build metadata",
+      "kind": "exactVersion",
+      "value": "1.0.0+build.1",
+      "expectedErrorCode": "exact_version.invalid"
+    },
+    {
+      "name": "Exact version rejects uppercase prerelease identifiers",
+      "kind": "exactVersion",
+      "value": "1.0.0-RC.1",
+      "expectedErrorCode": "exact_version.invalid"
+    },
+    {
+      "name": "Exact version rejects leading zeroes",
+      "kind": "exactVersion",
+      "value": "01.0.0",
+      "expectedErrorCode": "exact_version.invalid"
+    },
+    {
+      "name": "Exact version rejects a numeric prerelease leading zero",
+      "kind": "exactVersion",
+      "value": "1.0.0-01",
+      "expectedErrorCode": "exact_version.invalid"
+    }
+  ]
+}

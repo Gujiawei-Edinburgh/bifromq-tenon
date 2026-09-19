@@ -1,0 +1,275 @@
+{
+  "formatVersion": 1,
+  "valid": [
+    {
+      "name": "proto3 contract with an imported helper",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\n\npackage com.example.payload;\n\nimport \"helper.proto\";\n\noption java_package = \"com.example.payload\";\n\nmessage SinkRecordPayload {\n  string key = 1 [deprecated = true];\n  optional bytes value = 2;\n  PayloadMetadata metadata = 3;\n}\n"
+        },
+        {
+          "name": "helper.proto",
+          "content": "syntax = \"proto3\";\n\npackage com.example.payload;\n\nmessage PayloadMetadata {\n  uint64 timestamp = 1;\n}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedRootMessage": "com.example.payload.SinkRecordPayload"
+    },
+    {
+      "name": "proto3 contract without a package and with a helper message",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\n\nmessage SinkRecordPayload {\n  Measurement measurement = 1;\n}\n\nmessage Measurement {\n  string name = 1;\n  double value = 2;\n}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedRootMessage": "SinkRecordPayload"
+    },
+    {
+      "name": "Sink root can use any descriptor file name",
+      "files": [
+        {
+          "name": "payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "payload.proto"
+      ],
+      "expectedRootMessage": "SinkRecordPayload"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "malformed descriptor bytes",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "mutation": "truncate",
+      "expectedErrorCode": "payload_contract.descriptor_malformed"
+    },
+    {
+      "name": "empty descriptor set",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "mutation": "clearFiles",
+      "expectedErrorCode": "payload_contract.descriptor_empty"
+    },
+    {
+      "name": "descriptor file without a name",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "mutation": "clearRootFileName",
+      "expectedErrorCode": "payload_contract.file_name_missing"
+    },
+    {
+      "name": "duplicate descriptor file name",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "mutation": "duplicateRootFile",
+      "expectedErrorCode": "payload_contract.file_name_duplicate"
+    },
+    {
+      "name": "missing imported descriptor",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nimport \"helper.proto\";\nmessage SinkRecordPayload { Helper helper = 1; }\n"
+        },
+        {
+          "name": "helper.proto",
+          "content": "syntax = \"proto3\";\nmessage Helper { string value = 1; }\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "includeImports": false,
+      "expectedErrorCode": "payload_contract.dependency_missing"
+    },
+    {
+      "name": "proto2 contract",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto2\";\nmessage SinkRecordPayload { optional string value = 1; }\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.syntax_unsupported"
+    },
+    {
+      "name": "editions contract",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "edition = \"2024\";\nmessage SinkRecordPayload { string value = 1; }\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.editions_unsupported"
+    },
+    {
+      "name": "edition marker combined with proto3 syntax",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "mutation": "injectEditionMarker",
+      "expectedErrorCode": "payload_contract.editions_unsupported"
+    },
+    {
+      "name": "custom field option",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\n\nimport \"google/protobuf/descriptor.proto\";\n\nextend google.protobuf.FieldOptions {\n  string custom_rule = 50001;\n}\n\nmessage SinkRecordPayload {\n  string value = 1 [(custom_rule) = \"required\"];\n}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.custom_option_unsupported"
+    },
+    {
+      "name": "descriptor without source info",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "includeSourceInfo": false,
+      "expectedErrorCode": "payload_contract.source_info_missing"
+    },
+    {
+      "name": "top-level root message missing",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage DifferentPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.sink_root_missing"
+    },
+    {
+      "name": "root message is nested",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage Wrapper { message SinkRecordPayload {} }\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.sink_root_missing"
+    },
+    {
+      "name": "duplicate top-level root message",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "mutation": "duplicateRootMessage",
+      "expectedErrorCode": "payload_contract.sink_root_not_unique"
+    },
+    {
+      "name": "field names collide after portable normalization",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload {\n  string foo_bar = 1;\n  string Foo_bar = 2;\n}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.field_name_collision"
+    },
+    {
+      "name": "imported nested message field names collide after portable normalization",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nimport \"helper.proto\";\nmessage SinkRecordPayload { Helper.Nested nested = 1; }\n"
+        },
+        {
+          "name": "helper.proto",
+          "content": "syntax = \"proto3\";\nmessage Helper {\n  message Nested {\n    string device_id = 1;\n    string Device_id = 2;\n  }\n}\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "expectedErrorCode": "payload_contract.field_name_collision"
+    },
+    {
+      "name": "unresolvable field type",
+      "files": [
+        {
+          "name": "sink_record_payload.proto",
+          "content": "syntax = \"proto3\";\nmessage SinkRecordPayload { string value = 1; }\n"
+        }
+      ],
+      "entryFiles": [
+        "sink_record_payload.proto"
+      ],
+      "mutation": "replaceFieldWithMissingMessage",
+      "expectedErrorCode": "payload_contract.descriptor_invalid"
+    }
+  ]
+}

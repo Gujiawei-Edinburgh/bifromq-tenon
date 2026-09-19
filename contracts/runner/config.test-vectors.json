@@ -1,0 +1,198 @@
+{
+  "formatVersion": 1,
+  "valid": [
+    {
+      "name": "Minimal JSONC configuration",
+      "source": "{\n  // Runner-owned state\n  \"stateDirectory\": \"/var/lib/tenon\",\n  \"http\": {\"listenAddress\": \"127.0.0.1:8080\"},\n  \"pipeline\": {\"retryBackoff\": {\"initialDelayMs\": 100, \"maximumDelayMs\": 30000}},\n  \"lua\": {\"cpuTimeLimitMs\": 50, \"memoryLimitBytes\": 16777216}\n}",
+      "expected": {
+        "stateDirectory": "/var/lib/tenon",
+        "httpListenAddress": "127.0.0.1:8080",
+        "startupTimeoutMs": 30000,
+        "shutdownTimeoutMs": 30000,
+        "reconfigureTimeoutMs": 30000,
+        "retryBackoffInitialDelayMs": 100,
+        "retryBackoffMaximumDelayMs": 30000,
+        "luaCpuTimeLimitMs": 50,
+        "luaMemoryLimitBytes": 16777216
+      }
+    },
+    {
+      "name": "All optional fields",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\"},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000}},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expected": {
+        "stateDirectory": "/srv/tenon",
+        "httpListenAddress": "[::1]:9090",
+        "startupTimeoutMs": 45000,
+        "shutdownTimeoutMs": 60000,
+        "reconfigureTimeoutMs": 15000,
+        "retryBackoffInitialDelayMs": 250,
+        "retryBackoffMaximumDelayMs": 10000,
+        "luaCpuTimeLimitMs": 75,
+        "luaMemoryLimitBytes": 33554432
+      }
+    },
+    {
+      "name": "HTTPS identity paths",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\",\"tls\":{\"certificateChainFile\":\"/etc/tenon/tls/fullchain.pem\",\"privateKeyFile\":\"/etc/tenon/tls/key.pem\"}},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000}},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expected": {
+        "stateDirectory": "/srv/tenon",
+        "httpListenAddress": "[::1]:9090",
+        "startupTimeoutMs": 45000,
+        "shutdownTimeoutMs": 60000,
+        "reconfigureTimeoutMs": 15000,
+        "retryBackoffInitialDelayMs": 250,
+        "retryBackoffMaximumDelayMs": 10000,
+        "luaCpuTimeLimitMs": 75,
+        "luaMemoryLimitBytes": 33554432,
+        "httpTls": {
+          "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+          "privateKeyFile": "/etc/tenon/tls/key.pem",
+          "handshakeTimeoutMs": 10000
+        }
+      }
+    },
+    {
+      "name": "Explicit TLS handshake timeout",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\",\"tls\":{\"certificateChainFile\":\"/etc/tenon/tls/fullchain.pem\",\"privateKeyFile\":\"/etc/tenon/tls/key.pem\",\"handshakeTimeoutMs\":250}},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000}},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expected": {
+        "stateDirectory": "/srv/tenon",
+        "httpListenAddress": "[::1]:9090",
+        "startupTimeoutMs": 45000,
+        "shutdownTimeoutMs": 60000,
+        "reconfigureTimeoutMs": 15000,
+        "retryBackoffInitialDelayMs": 250,
+        "retryBackoffMaximumDelayMs": 10000,
+        "luaCpuTimeLimitMs": 75,
+        "luaMemoryLimitBytes": 33554432,
+        "httpTls": {
+          "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+          "privateKeyFile": "/etc/tenon/tls/key.pem",
+          "handshakeTimeoutMs": 250
+        }
+      }
+    },
+    {
+      "name": "Minimum TLS handshake timeout",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\",\"tls\":{\"certificateChainFile\":\"/etc/tenon/tls/fullchain.pem\",\"privateKeyFile\":\"/etc/tenon/tls/key.pem\",\"handshakeTimeoutMs\":1}},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000}},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expected": {
+        "stateDirectory": "/srv/tenon",
+        "httpListenAddress": "[::1]:9090",
+        "startupTimeoutMs": 45000,
+        "shutdownTimeoutMs": 60000,
+        "reconfigureTimeoutMs": 15000,
+        "retryBackoffInitialDelayMs": 250,
+        "retryBackoffMaximumDelayMs": 10000,
+        "luaCpuTimeLimitMs": 75,
+        "luaMemoryLimitBytes": 33554432,
+        "httpTls": {
+          "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+          "privateKeyFile": "/etc/tenon/tls/key.pem",
+          "handshakeTimeoutMs": 1
+        }
+      }
+    },
+    {
+      "name": "Maximum TLS handshake timeout",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\",\"tls\":{\"certificateChainFile\":\"/etc/tenon/tls/fullchain.pem\",\"privateKeyFile\":\"/etc/tenon/tls/key.pem\",\"handshakeTimeoutMs\":18446744073709551615}},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000}},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expected": {
+        "stateDirectory": "/srv/tenon",
+        "httpListenAddress": "[::1]:9090",
+        "startupTimeoutMs": 45000,
+        "shutdownTimeoutMs": 60000,
+        "reconfigureTimeoutMs": 15000,
+        "retryBackoffInitialDelayMs": 250,
+        "retryBackoffMaximumDelayMs": 10000,
+        "luaCpuTimeLimitMs": 75,
+        "luaMemoryLimitBytes": 33554432,
+        "httpTls": {
+          "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+          "privateKeyFile": "/etc/tenon/tls/key.pem",
+          "handshakeTimeoutMs": 18446744073709551615
+        }
+      }
+    },
+    {
+      "name": "Mutual TLS client CA absolute path",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\",\"tls\":{\"certificateChainFile\":\"/etc/tenon/tls/fullchain.pem\",\"privateKeyFile\":\"/etc/tenon/tls/key.pem\",\"clientCaFile\":\"/etc/tenon/client-ca.pem\"}},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000}},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expected": {
+        "stateDirectory": "/srv/tenon",
+        "httpListenAddress": "[::1]:9090",
+        "startupTimeoutMs": 45000,
+        "shutdownTimeoutMs": 60000,
+        "reconfigureTimeoutMs": 15000,
+        "retryBackoffInitialDelayMs": 250,
+        "retryBackoffMaximumDelayMs": 10000,
+        "luaCpuTimeLimitMs": 75,
+        "luaMemoryLimitBytes": 33554432,
+        "httpTls": {
+          "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+          "privateKeyFile": "/etc/tenon/tls/key.pem",
+          "handshakeTimeoutMs": 10000,
+          "clientCaFile": "/etc/tenon/client-ca.pem"
+        }
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "name": "State directory must be absolute",
+      "source": "{\"stateDirectory\":\"state\",\"http\":{\"listenAddress\":\"127.0.0.1:8080\"},\"pipeline\":{\"retryBackoff\":{\"initialDelayMs\":1,\"maximumDelayMs\":1}},\"lua\":{\"cpuTimeLimitMs\":1,\"memoryLimitBytes\":1}}",
+      "expectedCode": "runner_config.path_not_absolute",
+      "expectedPath": "/stateDirectory"
+    },
+    {
+      "name": "Retry maximum precedes initial delay",
+      "source": "{\"stateDirectory\":\"/var/lib/tenon\",\"http\":{\"listenAddress\":\"127.0.0.1:8080\"},\"pipeline\":{\"retryBackoff\":{\"initialDelayMs\":2,\"maximumDelayMs\":1}},\"lua\":{\"cpuTimeLimitMs\":1,\"memoryLimitBytes\":1}}",
+      "expectedCode": "runner_config.retry_backoff_invalid",
+      "expectedPath": "/pipeline/retryBackoff"
+    },
+    {
+      "name": "TLS certificateChainFile must be absolute",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\",\"tls\":{\"certificateChainFile\":\"relative.pem\",\"privateKeyFile\":\"/etc/tenon/tls/key.pem\"}},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000}},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expectedCode": "runner_config.path_not_absolute",
+      "expectedPath": "/http/tls/certificateChainFile"
+    },
+    {
+      "name": "TLS privateKeyFile must be absolute",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\",\"tls\":{\"certificateChainFile\":\"/etc/tenon/tls/fullchain.pem\",\"privateKeyFile\":\"relative.pem\"}},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000}},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expectedCode": "runner_config.path_not_absolute",
+      "expectedPath": "/http/tls/privateKeyFile"
+    },
+    {
+      "name": "TLS clientCaFile must be absolute",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\",\"tls\":{\"certificateChainFile\":\"/etc/tenon/tls/fullchain.pem\",\"privateKeyFile\":\"/etc/tenon/tls/key.pem\",\"clientCaFile\":\"relative.pem\"}},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000}},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expectedCode": "runner_config.path_not_absolute",
+      "expectedPath": "/http/tls/clientCaFile"
+    },
+    {
+      "name": "Metrics node identity rejects control characters",
+      "source": "{\"stateDirectory\":\"/var/lib/tenon\",\"http\":{\"listenAddress\":\"127.0.0.1:8080\"},\"pipeline\":{\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":100,\"maximumDelayMs\":30000}},\"lua\":{\"cpuTimeLimitMs\":50,\"memoryLimitBytes\":16777216},\"metrics\":{\"nodeId\":\"node\\nname\"}}",
+      "expectedCode": "runner_config.value_invalid",
+      "expectedPath": "/metrics/nodeId"
+    },
+    {
+      "name": "Metrics node identity rejects excessive UTF-8 bytes",
+      "source": "{\"stateDirectory\":\"/var/lib/tenon\",\"http\":{\"listenAddress\":\"127.0.0.1:8080\"},\"pipeline\":{\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":100,\"maximumDelayMs\":30000}},\"lua\":{\"cpuTimeLimitMs\":50,\"memoryLimitBytes\":16777216},\"metrics\":{\"nodeId\":\"\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\"}}",
+      "expectedCode": "runner_config.value_invalid",
+      "expectedPath": "/metrics/nodeId"
+    },
+    {
+      "name": "Metrics collection timeout rejects unsigned 64-bit overflow",
+      "source": "{\"stateDirectory\":\"/var/lib/tenon\",\"http\":{\"listenAddress\":\"127.0.0.1:8080\"},\"pipeline\":{\"retryBackoff\":{\"initialDelayMs\":100,\"maximumDelayMs\":30000}},\"lua\":{\"cpuTimeLimitMs\":50,\"memoryLimitBytes\":16777216},\"metrics\":{\"collectionTimeoutMs\":18446744073709551616}}",
+      "expectedCode": "runner_config.schema_invalid",
+      "expectedPath": "/metrics/collectionTimeoutMs"
+    },
+    {
+      "name": "Runner rejects Flow field maxPendingRecords",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\"},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000},\"maxPendingRecords\":100},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expectedPath": "/pipeline",
+      "expectedCode": "runner_config.schema_invalid"
+    },
+    {
+      "name": "Runner rejects Flow field maxRecordBytes",
+      "source": "{\"stateDirectory\":\"/srv/tenon\",\"http\":{\"listenAddress\":\"[::1]:9090\"},\"pipeline\":{\"startupTimeoutMs\":45000,\"shutdownTimeoutMs\":60000,\"reconfigureTimeoutMs\":15000,\"retryBackoff\":{\"initialDelayMs\":250,\"maximumDelayMs\":10000},\"maxRecordBytes\":1024},\"lua\":{\"cpuTimeLimitMs\":75,\"memoryLimitBytes\":33554432}}",
+      "expectedPath": "/pipeline",
+      "expectedCode": "runner_config.schema_invalid"
+    }
+  ]
+}

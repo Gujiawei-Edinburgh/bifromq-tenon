@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Generated capacity Source configuration",
+  "description": "Configures the generated Source used to prove admission backpressure.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "message",
+    "queueIndex",
+    "resultFile"
+  ],
+  "properties": {
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The payload published by both capacity probes."
+    },
+    "queueIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647,
+      "description": "The ordered Pipeline channel used by both capacity probes."
+    },
+    "resultFile": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The test-owned file receiving each Source acknowledgement."
+    }
+  }
+}

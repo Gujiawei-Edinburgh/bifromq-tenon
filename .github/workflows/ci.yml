@@ -1,0 +1,161 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  platform:
+    name: Platform (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-amd64
+            runner: ubuntu-24.04
+            macos_deployment_target: ""
+          - name: linux-arm64
+            runner: ubuntu-24.04-arm
+            macos_deployment_target: ""
+          - name: macos-arm64
+            runner: macos-15
+            macos_deployment_target: "14.4"
+          - name: macos-amd64
+            runner: macos-15-intel
+            macos_deployment_target: "14.4"
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Free unused Android SDK space on Linux
+        if: runner.os == 'Linux'
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android
+          df -h /
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up fixed Java toolchain
+        shell: bash
+        run: |
+          source sdk/java/.mvn/tenon-toolchain.sh
+          tenon_bootstrap_java "$PWD/sdk/java/.mvn/tenon-toolchain.properties"
+          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
+      - name: Restore isolated Java build dependencies
+        uses: actions/cache@v5
+        with:
+          path: target/runner-java-archetype/maven-repository
+          key: runner-java-maven-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('sdk/java/**/pom.xml', 'ipc/java/**/pom.xml', 'sdk/java/.mvn/**', 'sdk/java/mvnw') }}
+      - name: Restore verified Java Plugin bundles
+        uses: actions/cache@v5
+        with:
+          path: target/runner-java-archetype/packages
+          key: runner-java-bundles-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('sdk/java/**', 'ipc/java/**', 'contracts/ipc/**', 'contracts/source/**', 'contracts/sink/**', 'contracts/plugin/**', 'tests/fixtures/java-*/**', 'tests/runner_java_archetype.rs', 'Cargo.toml') }}
+      - name: Install the fixed Rust template generator
+        run: |
+          version=$(sed -n 's/^cargo_generate_version = "=\([^"]*\)"/\1/p' sdk/rust/rust-plugin-scaffold/cargo-generate.toml)
+          cargo install cargo-generate --version "$version" --locked
+      - name: Set up the configuration contract validator
+        run: |
+          python3 -m venv "$RUNNER_TEMP/tenon-python"
+          "$RUNNER_TEMP/tenon-python/bin/pip" install jsonschema==4.23.0
+          echo "$RUNNER_TEMP/tenon-python/bin" >> "$GITHUB_PATH"
+      - name: Verify Rust workspace
+        env:
+          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos_deployment_target }}
+        run: tools/verify-rust.sh
+      - name: Verify delegated Linux resource limits with the default Runner
+        if: runner.os == 'Linux'
+        run: |
+          cargo build --locked --bin tenon
+          cp target/debug/tenon "$RUNNER_TEMP/tenon-resource-runner"
+          cargo test --locked --features repository-test-support --test runner_resource_limits --no-run --message-format=json > "$RUNNER_TEMP/tenon-resource-artifacts.json"
+          resource_test_binary=$(python3 -c 'import json, sys; print(next(item["executable"] for item in map(json.loads, open(sys.argv[1])) if item.get("reason") == "compiler-artifact" and item["target"]["name"] == "runner_resource_limits" and item.get("executable")))' "$RUNNER_TEMP/tenon-resource-artifacts.json")
+          sudo systemd-run --quiet --wait --pipe --collect \
+            --unit="tenon-resource-tests-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --property="User=$(id -un)" --property="Group=$(id -gn)" \
+            --property="WorkingDirectory=$PWD" \
+            --property="Delegate=cpu memory" \
+            --property=KillMode=mixed --property=RuntimeMaxSec=300 \
+            /usr/bin/python3 "$PWD/tools/verify-process-resource-limits.py" \
+            "$resource_test_binary" "$RUNNER_TEMP/tenon-resource-runner"
+          python3 tools/verify-container-resource-limits.py \
+            "$RUNNER_TEMP/tenon-resource-runner" "$resource_test_binary"
+      - name: Upload verified Java bundle contracts
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-contracts-${{ matrix.name }}
+          path: target/runner-java-archetype/contracts/${{ matrix.name }}.json
+          if-no-files-found: error
+
+  java-contracts:
+    name: Cross-platform Java contracts
+    needs: platform
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Download native contract evidence
+        uses: actions/download-artifact@v4
+        with:
+          pattern: java-contracts-*
+          path: target/java-contracts
+          merge-multiple: true
+      - name: Install contract test dependencies
+        run: python3 -m pip install jsonschema==4.23.0
+      - name: Compare schema, descriptor and business JAR bytes
+        run: |
+          python3 -m unittest discover -s tools/tests
+          python3 tools/compare-java-bundle-contracts.py target/java-contracts/*.json
+
+  lua-sanitizers:
+    name: Lua C source sanitizers
+    runs-on: ubuntu-24.04
+    env:
+      ASAN_OPTIONS: detect_leaks=1
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install Clang sanitizer runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang-18 libclang-rt-18-dev
+      - name: Run Lua source regressions under sanitizers
+        env:
+          CC: clang-18
+        run: tools/verify-lua-source.sh
+
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up contract validation
+        run: python3 -m pip install jsonschema==4.23.0
+      - name: Validate contracts and documentation
+        run: |
+          python3 tools/validate-license-headers.py
+          python3 tools/validate-contracts.py
+          python3 tools/validate-public-docs.py

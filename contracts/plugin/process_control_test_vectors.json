@@ -1,0 +1,87 @@
+{
+  "formatVersion": 1,
+  "valid": [
+    {
+      "name": "Plugin Attach envelope",
+      "direction": "pluginToPipeline",
+      "messageKind": "attach",
+      "encoded": [
+        10,
+        18,
+        10,
+        16,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "name": "Plugin Ready envelope",
+      "direction": "pluginToPipeline",
+      "messageKind": "ready",
+      "encoded": [
+        18,
+        0
+      ]
+    },
+    {
+      "name": "Plugin SourceQuiesced envelope",
+      "direction": "pluginToPipeline",
+      "messageKind": "sourceQuiesced",
+      "encoded": [
+        26,
+        0
+      ]
+    },
+    {
+      "name": "Pipeline QuiesceSource envelope",
+      "direction": "pipelineToPlugin",
+      "messageKind": "quiesceSource",
+      "encoded": [
+        10,
+        0
+      ]
+    },
+    {
+      "name": "Pipeline Shutdown envelope",
+      "direction": "pipelineToPlugin",
+      "messageKind": "shutdown",
+      "encoded": [
+        18,
+        0
+      ]
+    }
+  ],
+  "malformed": [
+    {
+      "name": "Truncated Plugin-to-Pipeline envelope",
+      "direction": "pluginToPipeline",
+      "encoded": [
+        10,
+        2,
+        10
+      ]
+    },
+    {
+      "name": "Truncated Pipeline-to-Plugin envelope",
+      "direction": "pipelineToPlugin",
+      "encoded": [
+        10,
+        1
+      ]
+    }
+  ]
+}

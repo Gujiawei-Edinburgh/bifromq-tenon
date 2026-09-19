@@ -1,0 +1,8 @@
+{
+  "stateDirectory": "/var/lib/tenon",
+  "http": {"listenAddress": "0.0.0.0:8080"},
+  "pipeline": {
+    "retryBackoff": {"initialDelayMs": 100, "maximumDelayMs": 30000}
+  },
+  "lua": {"cpuTimeLimitMs": 50, "memoryLimitBytes": 16777216}
+}

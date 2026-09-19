@@ -1,0 +1,439 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "name": "Unified Program materials resolve one directed Flow",
+      "availablePrograms": [
+        {
+          "programName": "com.example.modbus",
+          "exactVersion": "1.0.0",
+          "interface": "source",
+          "configSchema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "additionalProperties": false
+          }
+        },
+        {
+          "programName": "com.example.kafka",
+          "exactVersion": "1.0.0",
+          "interface": "sink",
+          "configSchema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "required": [
+              "role"
+            ],
+            "properties": {
+              "role": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "runtime-ready",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.modbus",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "cloud": {
+            "programName": "com.example.kafka",
+            "exactVersion": "1.0.0",
+            "config": {
+              "role": "primary"
+            }
+          }
+        },
+        "flows": {
+          "telemetry": {
+            "parallelism": 0.5,
+            "source": "device",
+            "process": {
+              "script": "local builder = registry:getBuilder(\"com.example.kafka@1.0.0\")\nfunction main(event) emit() end"
+            },
+            "sinks": [
+              "cloud"
+            ]
+          }
+        }
+      },
+      "expected": {
+        "kind": "ready",
+        "programCount": 2,
+        "pluginInstanceCount": 2,
+        "flowCount": 1
+      }
+    },
+    {
+      "name": "One dual-interface Program material serves both projections",
+      "availablePrograms": [
+        {
+          "programName": "com.example.device",
+          "exactVersion": "1.0.0",
+          "interface": "source-and-sink",
+          "configSchema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "additionalProperties": false
+          }
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "self-control",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.device",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "self": {
+            "parallelism": 1,
+            "source": "device",
+            "process": {
+              "script": "local builder = registry:getBuilder(\"com.example.device@1.0.0\")\nfunction main(event) emit() end"
+            },
+            "sinks": [
+              "device"
+            ]
+          }
+        }
+      },
+      "expected": {
+        "kind": "ready",
+        "programCount": 1,
+        "pluginInstanceCount": 1,
+        "flowCount": 1
+      }
+    },
+    {
+      "name": "Missing Program is one issue for all referencing Instances",
+      "availablePrograms": [],
+      "document": {
+        "specVersion": "1",
+        "id": "missing-program",
+        "pluginInstances": {
+          "first": {
+            "programName": "com.example.missing",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "second": {
+            "programName": "com.example.missing",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "first",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "second"
+            ]
+          }
+        }
+      },
+      "expected": {
+        "kind": "unready",
+        "issues": [
+          {
+            "code": "plugin_program_missing",
+            "programName": "com.example.missing",
+            "exactVersion": "1.0.0",
+            "pluginInstanceIds": [
+              "first",
+              "second"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Config Schema is validated independently for each Instance",
+      "availablePrograms": [
+        {
+          "programName": "com.example.device",
+          "exactVersion": "1.0.0",
+          "interface": "source-and-sink",
+          "configSchema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "required": [
+              "endpoint"
+            ],
+            "properties": {
+              "endpoint": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "config-mismatch",
+        "pluginInstances": {
+          "valid": {
+            "programName": "com.example.device",
+            "exactVersion": "1.0.0",
+            "config": {
+              "endpoint": "one"
+            }
+          },
+          "invalid": {
+            "programName": "com.example.device",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "valid",
+            "process": {
+              "script": "local builder = registry:getBuilder(\"com.example.device@1.0.0\")\nfunction main(event) emit() end"
+            },
+            "sinks": [
+              "invalid"
+            ]
+          },
+          "reverse": {
+            "parallelism": 1,
+            "source": "invalid",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "valid"
+            ]
+          }
+        }
+      },
+      "expected": {
+        "kind": "unready",
+        "issues": [
+          {
+            "code": "plugin_config_schema_mismatch",
+            "pluginInstanceId": "invalid"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Flow Source requires the Program Source interface",
+      "availablePrograms": [
+        {
+          "programName": "com.example.sink",
+          "exactVersion": "1.0.0",
+          "interface": "sink",
+          "configSchema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object"
+          }
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "source-interface-missing",
+        "pluginInstances": {
+          "only": {
+            "programName": "com.example.sink",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "only",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "only"
+            ]
+          }
+        }
+      },
+      "expected": {
+        "kind": "unready",
+        "issues": [
+          {
+            "code": "plugin_source_interface_missing",
+            "pluginInstanceId": "only",
+            "flowId": "main"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Flow Sink requires the Program Sink interface",
+      "availablePrograms": [
+        {
+          "programName": "com.example.source",
+          "exactVersion": "1.0.0",
+          "interface": "source",
+          "configSchema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object"
+          }
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "sink-interface-missing",
+        "pluginInstances": {
+          "only": {
+            "programName": "com.example.source",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "only",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "only"
+            ]
+          }
+        }
+      },
+      "expected": {
+        "kind": "unready",
+        "issues": [
+          {
+            "code": "plugin_sink_interface_missing",
+            "pluginInstanceId": "only",
+            "flowIds": [
+              "main"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Every declared Program interface must be bound for each Instance",
+      "availablePrograms": [
+        {
+          "programName": "com.example.dual",
+          "exactVersion": "1.0.0",
+          "interface": "source-and-sink",
+          "configSchema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object"
+          }
+        },
+        {
+          "programName": "com.example.sink",
+          "exactVersion": "1.0.0",
+          "interface": "sink",
+          "configSchema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object"
+          }
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "interface-unbound",
+        "pluginInstances": {
+          "dual": {
+            "programName": "com.example.dual",
+            "exactVersion": "1.0.0",
+            "config": {}
+          },
+          "sink": {
+            "programName": "com.example.sink",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "dual",
+            "process": {
+              "script": "function main(event) emit() end"
+            },
+            "sinks": [
+              "sink"
+            ]
+          }
+        }
+      },
+      "expected": {
+        "kind": "unready",
+        "issues": [
+          {
+            "code": "plugin_interface_unbound",
+            "pluginInstanceId": "dual",
+            "interface": "sink"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Lua runtime binding failure is scoped to one Flow",
+      "availablePrograms": [
+        {
+          "programName": "com.example.device",
+          "exactVersion": "1.0.0",
+          "interface": "source-and-sink",
+          "configSchema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object"
+          }
+        }
+      ],
+      "document": {
+        "specVersion": "1",
+        "id": "lua-unready",
+        "pluginInstances": {
+          "device": {
+            "programName": "com.example.device",
+            "exactVersion": "1.0.0",
+            "config": {}
+          }
+        },
+        "flows": {
+          "main": {
+            "parallelism": 1,
+            "source": "device",
+            "process": {
+              "script": "local builder = registry:getBuilder(\"com.example.undeclared@1.0.0\")\nfunction main(event) emit() end"
+            },
+            "sinks": [
+              "device"
+            ]
+          }
+        }
+      },
+      "expected": {
+        "kind": "unready",
+        "issues": [
+          {
+            "code": "flow_lua_runtime_binding_invalid",
+            "flowId": "main"
+          }
+        ]
+      }
+    }
+  ]
+}

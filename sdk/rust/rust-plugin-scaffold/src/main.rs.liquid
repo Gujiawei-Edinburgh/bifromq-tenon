@@ -1,0 +1,48 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+//! The explicit entrypoint for this Plugin's declared interface.
+
+{% if interface != "source" %}mod file_program;
+mod output;
+{% endif %}mod payload;
+{% if interface != "sink" %}mod source;
+{% endif %}
+{% if interface == "source" %}use tenon_plugin_sdk::SourceProgram;
+
+fn main() {
+    let program =
+        SourceProgram::run(|config, _parallelism, sender| Ok(source::Source::new(&config, sender)));
+    program.await_shutdown();
+}
+{% elsif interface == "sink" %}use tenon_plugin_sdk::SinkProgram;
+
+fn main() {
+    let program = SinkProgram::run(file_program::FileProgram::new);
+    program.await_shutdown();
+}
+{% else %}use tenon_plugin_sdk::SourceAndSinkProgram;
+
+fn main() {
+    let program = SourceAndSinkProgram::run(|config, _parallelism, sender| {
+        file_program::FileProgram::new(config, sender)
+    });
+    program.await_shutdown();
+}
+{% endif -%}

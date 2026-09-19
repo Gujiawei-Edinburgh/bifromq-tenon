@@ -1,0 +1,359 @@
+{
+  "metrics": [
+    {
+      "name": "tenon.process.cpu",
+      "owner": "runner",
+      "kind": "gauge",
+      "unit": "1",
+      "attributes": []
+    },
+    {
+      "name": "tenon.process.memory",
+      "owner": "runner",
+      "kind": "gauge",
+      "unit": "By",
+      "attributes": []
+    },
+    {
+      "name": "tenon.pipeline.cpu",
+      "owner": "pipeline",
+      "kind": "gauge",
+      "unit": "1",
+      "attributes": []
+    },
+    {
+      "name": "tenon.pipeline.memory",
+      "owner": "pipeline",
+      "kind": "gauge",
+      "unit": "By",
+      "attributes": []
+    },
+    {
+      "name": "tenon.pipeline.state",
+      "owner": "runner",
+      "kind": "gauge",
+      "unit": "1",
+      "attributes": [
+        "tenon.pipeline.id"
+      ],
+      "values": {
+        "unready": 0,
+        "starting": 1,
+        "updating": 2,
+        "running": 3,
+        "restart-backoff": 4
+      }
+    },
+    {
+      "name": "tenon.pipeline.restarts",
+      "owner": "runner",
+      "kind": "counter",
+      "unit": "{restart}",
+      "attributes": [
+        "tenon.pipeline.id"
+      ]
+    },
+    {
+      "name": "tenon.plugin.state",
+      "owner": "pipeline",
+      "kind": "gauge",
+      "unit": "1",
+      "attributes": [
+        "tenon.plugin.instance.id"
+      ],
+      "values": {
+        "starting": 0,
+        "running": 1,
+        "start-failed": 2,
+        "restart-backoff": 3
+      }
+    },
+    {
+      "name": "tenon.plugin.restarts",
+      "owner": "pipeline",
+      "kind": "counter",
+      "unit": "{restart}",
+      "attributes": [
+        "tenon.plugin.instance.id"
+      ]
+    },
+    {
+      "name": "tenon.pipeline.configuration.applied",
+      "owner": "runner",
+      "kind": "gauge",
+      "unit": "1",
+      "attributes": [
+        "tenon.pipeline.id"
+      ],
+      "values": {
+        "not-applied": 0,
+        "applied": 1
+      }
+    },
+    {
+      "name": "tenon.flow.input.records",
+      "owner": "pipeline",
+      "kind": "counter",
+      "unit": "{record}",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index"
+      ]
+    },
+    {
+      "name": "tenon.flow.input.bytes",
+      "owner": "pipeline",
+      "kind": "counter",
+      "unit": "By",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index"
+      ]
+    },
+    {
+      "name": "tenon.flow.errors",
+      "owner": "pipeline",
+      "kind": "counter",
+      "unit": "{error}",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index",
+        "phase",
+        "error.type"
+      ],
+      "attributeValues": {
+        "phase": [
+          "decode",
+          "lua_initialize",
+          "lua_main"
+        ],
+        "error.type": [
+          "protobuf_invalid",
+          "unknown_enum_value",
+          "process.lua_initialization_failed",
+          "process.lua_syntax_invalid",
+          "process.lua_top_level_failed",
+          "process.lua_cpu_time_exceeded",
+          "process.lua_memory_exceeded",
+          "process.lua_resource_limit_exceeded",
+          "process.lua_internal_invariant_failed",
+          "process.lua_sandbox_violation",
+          "process.lua_main_missing",
+          "process.lua_main_not_function",
+          "process.lua_main_failed"
+        ]
+      }
+    },
+    {
+      "name": "tenon.flow.lua.duration",
+      "owner": "pipeline",
+      "kind": "histogram",
+      "unit": "s",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index"
+      ],
+      "statistics": [
+        "count",
+        "sum",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "name": "tenon.flow.lua.memory",
+      "owner": "pipeline",
+      "kind": "gauge",
+      "unit": "By",
+      "attributes": [
+        "tenon.flow.id"
+      ]
+    },
+    {
+      "name": "tenon.flow.emits",
+      "owner": "pipeline",
+      "kind": "counter",
+      "unit": "{emit}",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index",
+        "kind"
+      ],
+      "attributeValues": {
+        "kind": [
+          "payload",
+          "boundary"
+        ]
+      }
+    },
+    {
+      "name": "tenon.flow.completion.records",
+      "owner": "pipeline",
+      "kind": "counter",
+      "unit": "{record}",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index",
+        "result"
+      ],
+      "attributeValues": {
+        "result": [
+          "ok",
+          "retry",
+          "error"
+        ]
+      }
+    },
+    {
+      "name": "tenon.flow.egress.records",
+      "owner": "pipeline",
+      "kind": "counter",
+      "unit": "{record}",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index",
+        "tenon.plugin.instance.id"
+      ]
+    },
+    {
+      "name": "tenon.flow.egress.bytes",
+      "owner": "pipeline",
+      "kind": "counter",
+      "unit": "By",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index",
+        "tenon.plugin.instance.id"
+      ]
+    },
+    {
+      "name": "tenon.queue.usage",
+      "owner": "pipeline",
+      "kind": "gauge",
+      "unit": "By",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index",
+        "tenon.queue.kind"
+      ],
+      "attributeValues": {
+        "tenon.queue.kind": [
+          "submission",
+          "completion",
+          "egress"
+        ]
+      },
+      "conditionalAttributes": [
+        {
+          "name": "tenon.plugin.instance.id",
+          "when": {
+            "attribute": "tenon.queue.kind",
+            "values": [
+              "egress"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "tenon.queue.capacity",
+      "owner": "pipeline",
+      "kind": "gauge",
+      "unit": "By",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index",
+        "tenon.queue.kind"
+      ],
+      "attributeValues": {
+        "tenon.queue.kind": [
+          "submission",
+          "completion",
+          "egress"
+        ]
+      },
+      "conditionalAttributes": [
+        {
+          "name": "tenon.plugin.instance.id",
+          "when": {
+            "attribute": "tenon.queue.kind",
+            "values": [
+              "egress"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "tenon.flow.waiting",
+      "owner": "pipeline",
+      "kind": "gauge",
+      "unit": "1",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index"
+      ],
+      "values": {
+        "none": 0,
+        "egress_capacity": 1,
+        "sink_release": 2,
+        "completion_capacity": 3,
+        "completion_drain": 4,
+        "idle": 5
+      }
+    },
+    {
+      "name": "tenon.flow.wake.spurious",
+      "owner": "pipeline",
+      "kind": "counter",
+      "unit": "{wake}",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index"
+      ]
+    },
+    {
+      "name": "tenon.flow.wait.duration",
+      "owner": "pipeline",
+      "kind": "histogram",
+      "unit": "s",
+      "attributes": [
+        "tenon.flow.id",
+        "tenon.channel.index",
+        "wait.kind",
+        "result"
+      ],
+      "attributeValues": {
+        "wait.kind": [
+          "idle",
+          "egress_capacity",
+          "sink_release",
+          "completion_capacity",
+          "completion_drain"
+        ],
+        "result": [
+          "ready",
+          "cancelled"
+        ]
+      },
+      "conditionalAttributes": [
+        {
+          "name": "tenon.plugin.instance.id",
+          "when": {
+            "attribute": "wait.kind",
+            "values": [
+              "egress_capacity",
+              "sink_release"
+            ]
+          }
+        }
+      ],
+      "statistics": [
+        "count",
+        "sum",
+        "min",
+        "max"
+      ]
+    }
+  ]
+}

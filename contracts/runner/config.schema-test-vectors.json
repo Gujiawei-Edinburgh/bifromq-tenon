@@ -1,0 +1,1314 @@
+{
+  "valid": [
+    {
+      "name": "Explicit reconfiguration timeout",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Minimal Runner configuration",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "HTTPS server identity",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem"
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Explicit TLS handshake timeout",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "handshakeTimeoutMs": 250
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Minimum TLS handshake timeout",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "handshakeTimeoutMs": 1
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Maximum TLS handshake timeout",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "handshakeTimeoutMs": 18446744073709551615
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Empty distribution configuration",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "extra": {}
+      }
+    },
+    {
+      "name": "Opaque distribution configuration",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "extra": {
+          "license": {
+            "path": "/etc/tenon/license.bin"
+          },
+          "nested": [
+            true,
+            null,
+            42,
+            {
+              "value": "preserved"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Mutual TLS client trust anchors",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "clientCaFile": "/etc/tenon/client-ca.pem"
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Core pull metrics defaults",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {}
+      }
+    },
+    {
+      "name": "Core pull metrics custom label and timeout",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "nodeId": "node-a",
+          "collectionTimeoutMs": 750
+        }
+      }
+    },
+    {
+      "name": "Maximum metrics collection timeout",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "collectionTimeoutMs": 18446744073709551615
+        }
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "name": "Reconfiguration timeout must be positive",
+      "expectedInstancePointer": "/pipeline/reconfigureTimeoutMs",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 0,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Unknown top-level field is rejected",
+      "expectedInstancePointer": "",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "unsupportedField": true,
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Removed Plugin upload limit is rejected",
+      "expectedInstancePointer": "",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "plugins": {
+          "maximumPackageBytes": 67108864
+        }
+      }
+    },
+    {
+      "name": "Removed sourceMaxRecordSizeBytes is rejected",
+      "expectedInstancePointer": "/pipeline",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          },
+          "sourceMaxRecordSizeBytes": 1024
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Removed egressQueueDataCapacityBytes is rejected",
+      "expectedInstancePointer": "/pipeline",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          },
+          "egressQueueDataCapacityBytes": 1024
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "TLS must be an object",
+      "expectedInstancePointer": "/http/tls",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": true
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "TLS must not be null",
+      "expectedInstancePointer": "/http/tls",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": null
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "TLS certificate is required",
+      "expectedInstancePointer": "/http/tls",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "privateKeyFile": "/etc/tenon/tls/key.pem"
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "TLS private key is required",
+      "expectedInstancePointer": "/http/tls",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem"
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "TLS rejects enabled flag",
+      "expectedInstancePointer": "/http/tls",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "enabled": true
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "TLS certificate path is nonempty",
+      "expectedInstancePointer": "/http/tls/certificateChainFile",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "",
+            "privateKeyFile": "/etc/tenon/tls/key.pem"
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "TLS private key path is a string",
+      "expectedInstancePointer": "/http/tls/privateKeyFile",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": 1
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Zero TLS handshake timeout",
+      "expectedInstancePointer": "/http/tls/handshakeTimeoutMs",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "handshakeTimeoutMs": 0
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Negative TLS handshake timeout",
+      "expectedInstancePointer": "/http/tls/handshakeTimeoutMs",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "handshakeTimeoutMs": -1
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Fractional TLS handshake timeout",
+      "expectedInstancePointer": "/http/tls/handshakeTimeoutMs",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "handshakeTimeoutMs": 1.5
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "String TLS handshake timeout",
+      "expectedInstancePointer": "/http/tls/handshakeTimeoutMs",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "handshakeTimeoutMs": "10000"
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Null TLS handshake timeout",
+      "expectedInstancePointer": "/http/tls/handshakeTimeoutMs",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "handshakeTimeoutMs": null
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Oversized TLS handshake timeout",
+      "expectedInstancePointer": "/http/tls/handshakeTimeoutMs",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "handshakeTimeoutMs": 18446744073709551616
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      }
+    },
+    {
+      "name": "Removed Tenon Document source limit is rejected",
+      "expectedInstancePointer": "",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "tenonDocuments": {
+          "maximumSourceBytes": 1048576
+        }
+      }
+    },
+    {
+      "name": "Null distribution configuration is rejected",
+      "expectedInstancePointer": "/extra",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "extra": null
+      }
+    },
+    {
+      "name": "Array distribution configuration is rejected",
+      "expectedInstancePointer": "/extra",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "extra": []
+      }
+    },
+    {
+      "name": "String distribution configuration is rejected",
+      "expectedInstancePointer": "/extra",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "extra": "invalid"
+      }
+    },
+    {
+      "name": "Number distribution configuration is rejected",
+      "expectedInstancePointer": "/extra",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "extra": 7
+      }
+    },
+    {
+      "name": "Boolean distribution configuration is rejected",
+      "expectedInstancePointer": "/extra",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "extra": true
+      }
+    },
+    {
+      "name": "Client CA path rejects empty",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "clientCaFile": ""
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      },
+      "expectedInstancePointer": "/http/tls/clientCaFile"
+    },
+    {
+      "name": "Client CA path rejects null",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "clientCaFile": null
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      },
+      "expectedInstancePointer": "/http/tls/clientCaFile"
+    },
+    {
+      "name": "Client CA path rejects number",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "clientCaFile": 1
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      },
+      "expectedInstancePointer": "/http/tls/clientCaFile"
+    },
+    {
+      "name": "Client CA path rejects boolean",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "clientCaFile": true
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      },
+      "expectedInstancePointer": "/http/tls/clientCaFile"
+    },
+    {
+      "name": "Client CA path rejects array",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "clientCaFile": []
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      },
+      "expectedInstancePointer": "/http/tls/clientCaFile"
+    },
+    {
+      "name": "Client CA path rejects object",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080",
+          "tls": {
+            "certificateChainFile": "/etc/tenon/tls/fullchain.pem",
+            "privateKeyFile": "/etc/tenon/tls/key.pem",
+            "clientCaFile": {}
+          }
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        }
+      },
+      "expectedInstancePointer": "/http/tls/clientCaFile"
+    },
+    {
+      "name": "Metrics node identity must be a string",
+      "expectedInstancePointer": "/metrics/nodeId",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "nodeId": null
+        }
+      }
+    },
+    {
+      "name": "Metrics node identity must not be empty",
+      "expectedInstancePointer": "/metrics/nodeId",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "nodeId": ""
+        }
+      }
+    },
+    {
+      "name": "Metrics rejects unknown fields",
+      "expectedInstancePointer": "/metrics",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "extra": true
+        }
+      }
+    },
+    {
+      "name": "Metrics collection timeout must be positive",
+      "expectedInstancePointer": "/metrics/collectionTimeoutMs",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "collectionTimeoutMs": 0
+        }
+      }
+    },
+    {
+      "name": "Metrics collection timeout must be an integer",
+      "expectedInstancePointer": "/metrics/collectionTimeoutMs",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "collectionTimeoutMs": 1.5
+        }
+      }
+    },
+    {
+      "name": "Metrics collection timeout must not be null",
+      "expectedInstancePointer": "/metrics/collectionTimeoutMs",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "collectionTimeoutMs": null
+        }
+      }
+    },
+    {
+      "name": "Metrics rejects removed endpoint",
+      "expectedInstancePointer": "/metrics",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "endpoint": "http://127.0.0.1:4317"
+        }
+      }
+    },
+    {
+      "name": "Metrics rejects removed exportIntervalMs",
+      "expectedInstancePointer": "/metrics",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "exportIntervalMs": 10000
+        }
+      }
+    },
+    {
+      "name": "Metrics rejects removed exportTimeoutMs",
+      "expectedInstancePointer": "/metrics",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "exportTimeoutMs": 2000
+        }
+      }
+    },
+    {
+      "name": "Metrics rejects removed headers",
+      "expectedInstancePointer": "/metrics",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "headers": {}
+        }
+      }
+    },
+    {
+      "name": "Metrics rejects removed tls",
+      "expectedInstancePointer": "/metrics",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "tls": {}
+        }
+      }
+    },
+    {
+      "name": "Metrics collection timeout exceeds unsigned 64-bit range",
+      "config": {
+        "stateDirectory": "/var/lib/tenon",
+        "http": {
+          "listenAddress": "127.0.0.1:8080"
+        },
+        "pipeline": {
+          "retryBackoff": {
+            "initialDelayMs": 100,
+            "maximumDelayMs": 30000
+          }
+        },
+        "lua": {
+          "cpuTimeLimitMs": 50,
+          "memoryLimitBytes": 16777216
+        },
+        "metrics": {
+          "collectionTimeoutMs": 18446744073709551616
+        }
+      },
+      "expectedInstancePointer": "/metrics/collectionTimeoutMs"
+    },
+    {
+      "name": "Runner rejects Flow field maxPendingRecords",
+      "config": {
+        "stateDirectory": "/srv/tenon",
+        "http": {
+          "listenAddress": "[::1]:9090"
+        },
+        "pipeline": {
+          "startupTimeoutMs": 45000,
+          "shutdownTimeoutMs": 60000,
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 250,
+            "maximumDelayMs": 10000
+          },
+          "maxPendingRecords": 100
+        },
+        "lua": {
+          "cpuTimeLimitMs": 75,
+          "memoryLimitBytes": 33554432
+        }
+      },
+      "expectedInstancePointer": "/pipeline"
+    },
+    {
+      "name": "Runner rejects Flow field maxRecordBytes",
+      "config": {
+        "stateDirectory": "/srv/tenon",
+        "http": {
+          "listenAddress": "[::1]:9090"
+        },
+        "pipeline": {
+          "startupTimeoutMs": 45000,
+          "shutdownTimeoutMs": 60000,
+          "reconfigureTimeoutMs": 15000,
+          "retryBackoff": {
+            "initialDelayMs": 250,
+            "maximumDelayMs": 10000
+          },
+          "maxRecordBytes": 1024
+        },
+        "lua": {
+          "cpuTimeLimitMs": 75,
+          "memoryLimitBytes": 33554432
+        }
+      },
+      "expectedInstancePointer": "/pipeline"
+    }
+  ]
+}

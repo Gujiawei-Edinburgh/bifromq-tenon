@@ -1,0 +1,590 @@
+{
+  "formatVersion": 2,
+  "startup": {
+    "valid": [
+      {
+        "name": "Instance startup binds working directory and private lifecycle stream",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/var/lib/tenon/pipelines/pipeline-a/instances/device\",\"controlSocket\":\"/var/lib/tenon/pipelines/pipeline-a/plugin-control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\",\"sourceChannelRegion\":\"/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells\"}"
+        ],
+        "stdin": "{\"endpoint\":\"device-a\"}\n",
+        "config": {
+          "endpoint": "device-a"
+        },
+        "interface": "source",
+        "sdkConfig": {
+          "workingDirectory": "/var/lib/tenon/pipelines/pipeline-a/instances/device",
+          "controlSocket": "/var/lib/tenon/pipelines/pipeline-a/plugin-control.sock",
+          "launchId": "AAECAwQFBgcICQoLDA0ODw==",
+          "sourceChannelRegion": "/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells"
+        }
+      },
+      {
+        "name": "Null config remains an ordinary JSON value",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/var/lib/tenon/pipelines/pipeline-a/instances/device\",\"controlSocket\":\"/var/lib/tenon/pipelines/pipeline-a/plugin-control.sock\",\"launchId\":\"EBESExQVFhcYGRobHB0eHw==\",\"sourceChannelRegion\":\"/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells\"}"
+        ],
+        "stdin": "null\n",
+        "config": null,
+        "interface": "source",
+        "sdkConfig": {
+          "workingDirectory": "/var/lib/tenon/pipelines/pipeline-a/instances/device",
+          "controlSocket": "/var/lib/tenon/pipelines/pipeline-a/plugin-control.sock",
+          "launchId": "EBESExQVFhcYGRobHB0eHw==",
+          "sourceChannelRegion": "/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells"
+        }
+      },
+      {
+        "name": "sink startup preserves config and identifies every independent input queue",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/var/lib/tenon/pipelines/pipeline-a/instances/device\",\"controlSocket\":\"/var/lib/tenon/pipelines/pipeline-a/plugin-control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\",\"sinkInputs\":[{\"flowId\":\"main\",\"channelId\":0,\"channelBellPath\":\"/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells\"},{\"flowId\":\"main\",\"channelId\":1,\"channelBellPath\":\"/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells\"},{\"flowId\":\"plant/\u6e29\u5ea6\",\"channelId\":0,\"channelBellPath\":\"/var/lib/tenon/pipelines/pipeline-a/flows/VxG9Y72t3_y_GFrl1FVgDD38bUIkyc9qF89O_1NtupQ/channels.bells\"},{\"flowId\":\"\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754cab\",\"channelId\":2147483646,\"channelBellPath\":\"/var/lib/tenon/pipelines/pipeline-a/flows/wlJIThBctvMEXDdsVqWpfqGNUCacyOOnktwvvfk5ZHA/channels.bells\"}]}"
+        ],
+        "stdin": "{\"endpoint\":\"device-a\"}\n",
+        "config": {
+          "endpoint": "device-a"
+        },
+        "interface": "sink",
+        "sdkConfig": {
+          "workingDirectory": "/var/lib/tenon/pipelines/pipeline-a/instances/device",
+          "controlSocket": "/var/lib/tenon/pipelines/pipeline-a/plugin-control.sock",
+          "launchId": "AAECAwQFBgcICQoLDA0ODw==",
+          "sinkInputs": [
+            {
+              "flowId": "main",
+              "channelId": 0,
+              "channelBellPath": "/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells"
+            },
+            {
+              "flowId": "main",
+              "channelId": 1,
+              "channelBellPath": "/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells"
+            },
+            {
+              "flowId": "plant/\u6e29\u5ea6",
+              "channelId": 0,
+              "channelBellPath": "/var/lib/tenon/pipelines/pipeline-a/flows/VxG9Y72t3_y_GFrl1FVgDD38bUIkyc9qF89O_1NtupQ/channels.bells"
+            },
+            {
+              "flowId": "\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754cab",
+              "channelId": 2147483646,
+              "channelBellPath": "/var/lib/tenon/pipelines/pipeline-a/flows/wlJIThBctvMEXDdsVqWpfqGNUCacyOOnktwvvfk5ZHA/channels.bells"
+            }
+          ]
+        },
+        "relativeQueuePaths": [
+          "sink/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/egress-0.queue",
+          "sink/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/egress-1.queue",
+          "sink/VxG9Y72t3_y_GFrl1FVgDD38bUIkyc9qF89O_1NtupQ/egress-0.queue",
+          "sink/wlJIThBctvMEXDdsVqWpfqGNUCacyOOnktwvvfk5ZHA/egress-2147483646.queue"
+        ]
+      },
+      {
+        "name": "source-and-sink startup preserves config and identifies every independent input queue",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/var/lib/tenon/pipelines/pipeline-a/instances/device\",\"controlSocket\":\"/var/lib/tenon/pipelines/pipeline-a/plugin-control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\",\"sourceChannelRegion\":\"/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells\",\"sinkInputs\":[{\"flowId\":\"main\",\"channelId\":0,\"channelBellPath\":\"/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells\"},{\"flowId\":\"main\",\"channelId\":1,\"channelBellPath\":\"/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells\"},{\"flowId\":\"plant/\u6e29\u5ea6\",\"channelId\":0,\"channelBellPath\":\"/var/lib/tenon/pipelines/pipeline-a/flows/VxG9Y72t3_y_GFrl1FVgDD38bUIkyc9qF89O_1NtupQ/channels.bells\"},{\"flowId\":\"\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754cab\",\"channelId\":2147483646,\"channelBellPath\":\"/var/lib/tenon/pipelines/pipeline-a/flows/wlJIThBctvMEXDdsVqWpfqGNUCacyOOnktwvvfk5ZHA/channels.bells\"}]}"
+        ],
+        "stdin": "{\"endpoint\":\"device-a\"}\n",
+        "config": {
+          "endpoint": "device-a"
+        },
+        "interface": "source-and-sink",
+        "sdkConfig": {
+          "workingDirectory": "/var/lib/tenon/pipelines/pipeline-a/instances/device",
+          "controlSocket": "/var/lib/tenon/pipelines/pipeline-a/plugin-control.sock",
+          "launchId": "AAECAwQFBgcICQoLDA0ODw==",
+          "sourceChannelRegion": "/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells",
+          "sinkInputs": [
+            {
+              "flowId": "main",
+              "channelId": 0,
+              "channelBellPath": "/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells"
+            },
+            {
+              "flowId": "main",
+              "channelId": 1,
+              "channelBellPath": "/var/lib/tenon/pipelines/pipeline-a/flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells"
+            },
+            {
+              "flowId": "plant/\u6e29\u5ea6",
+              "channelId": 0,
+              "channelBellPath": "/var/lib/tenon/pipelines/pipeline-a/flows/VxG9Y72t3_y_GFrl1FVgDD38bUIkyc9qF89O_1NtupQ/channels.bells"
+            },
+            {
+              "flowId": "\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754cab",
+              "channelId": 2147483646,
+              "channelBellPath": "/var/lib/tenon/pipelines/pipeline-a/flows/wlJIThBctvMEXDdsVqWpfqGNUCacyOOnktwvvfk5ZHA/channels.bells"
+            }
+          ]
+        },
+        "relativeQueuePaths": [
+          "sink/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/egress-0.queue",
+          "sink/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/egress-1.queue",
+          "sink/VxG9Y72t3_y_GFrl1FVgDD38bUIkyc9qF89O_1NtupQ/egress-0.queue",
+          "sink/wlJIThBctvMEXDdsVqWpfqGNUCacyOOnktwvvfk5ZHA/egress-2147483646.queue"
+        ]
+      }
+    ],
+    "invalid": [
+      {
+        "name": "Runtime arguments are missing",
+        "arguments": [],
+        "stdin": "{}\n",
+        "expectedErrorCode": "plugin.startup.arguments_invalid"
+      },
+      {
+        "name": "Working directory is relative",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}"
+        ],
+        "stdin": "{}\n",
+        "expectedErrorCode": "plugin.startup.working_directory_invalid"
+      },
+      {
+        "name": "Control socket is relative",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}"
+        ],
+        "stdin": "{}\n",
+        "expectedErrorCode": "plugin.startup.control_socket_invalid"
+      },
+      {
+        "name": "Launch id is malformed",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"launch-a\"}"
+        ],
+        "stdin": "{}\n",
+        "expectedErrorCode": "plugin.startup.launch_id_invalid"
+      },
+      {
+        "name": "An extra argument follows the reserved startup option",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}",
+          "extra"
+        ],
+        "stdin": "{}\n",
+        "expectedErrorCode": "plugin.startup.arguments_invalid"
+      },
+      {
+        "name": "A reserved startup option is misspelled",
+        "arguments": [
+          "--sdk-settings",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}"
+        ],
+        "stdin": "{}\n",
+        "expectedErrorCode": "plugin.startup.arguments_invalid"
+      },
+      {
+        "name": "Config input is empty",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}"
+        ],
+        "stdin": "\n",
+        "expectedErrorCode": "plugin.startup.config_invalid"
+      },
+      {
+        "name": "Config JSON is malformed",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}"
+        ],
+        "stdin": "{\n",
+        "expectedErrorCode": "plugin.startup.config_invalid"
+      },
+      {
+        "name": "Config contains a second JSON value",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}"
+        ],
+        "stdin": "{} []\n",
+        "expectedErrorCode": "plugin.startup.config_invalid"
+      },
+      {
+        "name": "Config line terminator is missing",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}"
+        ],
+        "stdin": "{}",
+        "expectedErrorCode": "plugin.startup.config_invalid"
+      },
+      {
+        "name": "Startup document is not JSON",
+        "arguments": [
+          "--sdk-config",
+          "{"
+        ],
+        "stdin": "{}\n",
+        "expectedErrorCode": "plugin.startup.sdk_config_invalid"
+      },
+      {
+        "name": "Startup document is not an object",
+        "arguments": [
+          "--sdk-config",
+          "[]"
+        ],
+        "stdin": "{}\n",
+        "expectedErrorCode": "plugin.startup.sdk_config_invalid"
+      },
+      {
+        "name": "Startup document carries an unknown key",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\",\"sinkChannels\":[]}"
+        ],
+        "stdin": "{}\n",
+        "expectedErrorCode": "plugin.startup.sdk_config_invalid"
+      },
+      {
+        "name": "Startup document omits the working directory",
+        "arguments": [
+          "--sdk-config",
+          "{\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}"
+        ],
+        "stdin": "{}\n",
+        "expectedErrorCode": "plugin.startup.sdk_config_invalid"
+      },
+      {
+        "name": "Source startup omits the Channel doorbell Region",
+        "interface": "source",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}"
+        ],
+        "stdin": "{\"endpoint\":\"device-a\"}\n",
+        "expectedErrorCode": "plugin.startup.channel_bell_path_invalid"
+      },
+      {
+        "name": "Channel doorbell Region is a relative path",
+        "interface": "source",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\",\"sourceChannelRegion\":\"flows/DW5AeeNnA-vTfAByL1iR0osOKBHcEUsSkhUSOtzONgU/channels.bells\"}"
+        ],
+        "stdin": "{\"endpoint\":\"device-a\"}\n",
+        "expectedErrorCode": "plugin.startup.channel_bell_path_invalid"
+      },
+      {
+        "name": "Sink startup omits its inputs",
+        "interface": "sink",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\"}"
+        ],
+        "stdin": "{\"endpoint\":\"device-a\"}\n",
+        "expectedErrorCode": "plugin.startup.sink_channels_invalid"
+      },
+      {
+        "name": "Sink input omits the Channel doorbell Region",
+        "interface": "sink",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\",\"sinkInputs\":[{\"flowId\":\"main\",\"channelId\":0}]}"
+        ],
+        "stdin": "{\"endpoint\":\"device-a\"}\n",
+        "expectedErrorCode": "plugin.startup.sdk_config_invalid"
+      },
+      {
+        "name": "Sink input names a relative Channel doorbell Region",
+        "interface": "sink",
+        "arguments": [
+          "--sdk-config",
+          "{\"workingDirectory\":\"/tmp/instances/device\",\"controlSocket\":\"/tmp/control.sock\",\"launchId\":\"AAECAwQFBgcICQoLDA0ODw==\",\"sinkInputs\":[{\"flowId\":\"main\",\"channelId\":0,\"channelBellPath\":\"sink/channels.bells\"}]}"
+        ],
+        "stdin": "{\"endpoint\":\"device-a\"}\n",
+        "expectedErrorCode": "plugin.startup.sink_channels_invalid"
+      }
+    ]
+  },
+  "initialActivation": [
+    {
+      "name": "Every Instance may still be starting when the revision is published",
+      "behavior": "normal",
+      "expectedInstanceStates": {
+        "archive": "starting",
+        "dual-a": "starting",
+        "dual-b": "starting",
+        "input": "starting"
+      }
+    },
+    {
+      "name": "A failed Program does not prevent complete revision publication",
+      "behavior": "missing-dual-program",
+      "expectedInstanceStates": {
+        "archive": "starting",
+        "dual-a": "start-failed",
+        "dual-b": "start-failed",
+        "input": "starting"
+      }
+    },
+    {
+      "name": "A complete local revision may contain only failed starts",
+      "behavior": "missing-all-programs",
+      "expectedInstanceStates": {
+        "archive": "start-failed",
+        "dual-a": "start-failed",
+        "dual-b": "start-failed",
+        "input": "start-failed"
+      }
+    }
+  ],
+  "sinkConfigurationReplacement": {
+    "name": "Sink configuration replacement retains unacknowledged output",
+    "instanceId": "archive",
+    "currentConfig": {
+      "instance": "archive",
+      "endpoint": "before"
+    },
+    "targetConfig": {
+      "instance": "archive",
+      "endpoint": "after"
+    },
+    "payloadText": "retained-output"
+  },
+  "configurationOnlyReplacement": [
+    {
+      "name": "Failed cloud target starts before healthy device source handoff",
+      "flows": {
+        "telemetry": [
+          "device",
+          "cloud"
+        ],
+        "command": [
+          "cloud",
+          "device"
+        ]
+      },
+      "currentPhases": {
+        "device": "ready",
+        "cloud": "backoff"
+      },
+      "replacedInstances": [
+        "device",
+        "cloud"
+      ],
+      "expectedOrder": [
+        "cloud.old-process-reaped",
+        "cloud.target-launch-started",
+        "device.source-quiesced",
+        "device.old-completions-consumed",
+        "device.old-process-reaped",
+        "device.target-launch-started",
+        "revision.published"
+      ],
+      "preservedResources": [
+        "queues",
+        "channels",
+        "lua",
+        "timers",
+        "routes",
+        "sink-endpoints"
+      ]
+    },
+    {
+      "name": "Healthy bidirectional instances keep both sinks during source handoff",
+      "flows": {
+        "telemetry": [
+          "device",
+          "cloud"
+        ],
+        "command": [
+          "cloud",
+          "device"
+        ]
+      },
+      "currentPhases": {
+        "device": "ready",
+        "cloud": "ready"
+      },
+      "replacedInstances": [
+        "device",
+        "cloud"
+      ],
+      "sinksAliveDuringOldSourceHandoff": [
+        "device",
+        "cloud"
+      ],
+      "oldSourcesFinishedBeforeAnyHealthySinkShutdown": [
+        "device",
+        "cloud"
+      ]
+    },
+    {
+      "name": "Self routed source retains its sink during handoff",
+      "flows": {
+        "local-control": [
+          "device",
+          "device"
+        ]
+      },
+      "currentPhases": {
+        "device": "ready"
+      },
+      "replacedInstances": [
+        "device"
+      ],
+      "sinksAliveDuringOldSourceHandoff": [
+        "device"
+      ],
+      "oldSourcesFinishedBeforeAnyHealthySinkShutdown": [
+        "device"
+      ]
+    },
+    {
+      "name": "Healthy old process loss after source quiescence aborts cutover",
+      "flows": {
+        "telemetry": [
+          "device",
+          "archive"
+        ]
+      },
+      "currentPhases": {
+        "device": "ready",
+        "archive": "ready"
+      },
+      "replacedInstances": [
+        "device"
+      ],
+      "failure": "device.process-exits-before-old-completions-consumed",
+      "expectedOutcome": "pipeline-terminated-without-target-publication"
+    }
+  ],
+  "sourceFailureDuringConfiguration": [
+    {
+      "name": "Early target Source exits before Ready",
+      "behavior": "exit-before-ready",
+      "expectedOutcome": "pipeline-terminated-without-target-publication"
+    },
+    {
+      "name": "Early target Source loses its stream after Ready",
+      "behavior": "stream-loss-after-ready",
+      "expectedOutcome": "pipeline-terminated-without-target-publication"
+    }
+  ],
+  "lifecycle": [
+    {
+      "name": "One shared owner keeps Sink and Source completions alive through Source quiesce",
+      "scenario": "shared-owner",
+      "interface": "source-and-sink",
+      "businessEvents": [
+        "owner.start",
+        "source.start",
+        "source.quiesce",
+        "source.admission-closed",
+        "source.close",
+        "owner.close"
+      ],
+      "completionAfterQuiesce": "OK",
+      "sinkWriteAfterQuiesce": "after-quiesce"
+    },
+    {
+      "name": "Final Sink shutdown exits without a terminal acknowledgement",
+      "scenario": "sink-shutdown",
+      "interface": "sink",
+      "businessEvents": [
+        "owner.start",
+        "owner.close"
+      ]
+    }
+  ],
+  "lifecycleInvalid": [
+    {
+      "name": "Ready before Attach is rejected",
+      "interface": "source",
+      "events": [
+        "control.ready"
+      ],
+      "receiver": "pipeline",
+      "expectedRejection": "InvalidArgument"
+    },
+    {
+      "name": "Duplicate Attach is rejected",
+      "interface": "source",
+      "events": [
+        "control.attach",
+        "control.attach"
+      ],
+      "receiver": "pipeline",
+      "expectedRejection": "UnexpectedMessage"
+    },
+    {
+      "name": "Duplicate Ready is rejected",
+      "interface": "source-and-sink",
+      "events": [
+        "control.attach",
+        "control.ready",
+        "control.ready"
+      ],
+      "receiver": "pipeline",
+      "expectedRejection": "UnexpectedMessage"
+    },
+    {
+      "name": "SourceQuiesced before QuiesceSource is rejected",
+      "interface": "source",
+      "events": [
+        "control.attach",
+        "control.ready",
+        "control.source-quiesced"
+      ],
+      "receiver": "pipeline",
+      "expectedRejection": "UnexpectedMessage"
+    },
+    {
+      "name": "QuiesceSource for Sink-only Instance is rejected",
+      "interface": "sink",
+      "events": [
+        "control.attach",
+        "control.ready",
+        "control.quiesce-source"
+      ],
+      "receiver": "sdk",
+      "exitCode": 1,
+      "businessCloseCount": 0
+    },
+    {
+      "name": "Shutdown before Source quiesce is rejected",
+      "interface": "source-and-sink",
+      "events": [
+        "control.attach",
+        "control.ready",
+        "control.shutdown"
+      ],
+      "receiver": "sdk",
+      "exitCode": 1,
+      "businessCloseCount": 0
+    },
+    {
+      "name": "Stdin EOF is fatal without graceful close",
+      "interface": "source-and-sink",
+      "events": [
+        "control.attach",
+        "control.ready",
+        "stdin.eof"
+      ],
+      "businessCloseCount": 0,
+      "receiver": "sdk",
+      "exitCode": 1
+    },
+    {
+      "name": "Lifecycle stream EOF is fatal without reconnect",
+      "interface": "source",
+      "events": [
+        "control.attach",
+        "control.ready",
+        "control.stream-eof"
+      ],
+      "businessCloseCount": 0,
+      "receiver": "sdk",
+      "exitCode": 1
+    }
+  ]
+}

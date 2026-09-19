@@ -1,0 +1,90 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+# {{ project-name }}
+
+A `{{ interface }}` plugin for Tenon, using `tenon-plugin-sdk`. Customize the code under `src/` and use the commands below to build an installation bundle.
+
+Edit `display-name` and `description` under `[package.metadata.tenon]` in Cargo.toml before distributing the plugin. Both are required nonblank plain text: the single-line name allows 1-80 Unicode code points, and the description allows 1-1024 with LF/CR line breaks. The bundler validates and preserves the configured text for Console.
+
+## Build and test
+
+Use Rust 1.97.1 and a native compiler/linker. Install the build tool from crates.io, then run:
+
+```bash
+cargo install cargo-tenon --version 0.1.0 --locked
+cargo test
+cargo tenon build
+cargo tenon bundle --release
+```
+
+Cargo resolves the SDK dependency from crates.io. Keep the generated `Cargo.lock` in version control and add `--locked` after the first successful dependency resolution. Protobuf build dependencies supply `protoc`; it is not required on the deployment machine.
+
+`bundle` prints a JSON result whose `bundle` field gives the installation archive path. It builds for the host reported by `rustc -vV` unless you specify `--target <triple>`. Cross-compilation requires the target's Rust standard library, compiler/linker, and native libraries.
+
+Tenon launches the executable and supplies configuration, queues, and its control connection. Install the bundle and configure a flow to test actual delivery; `cargo run` alone does not provide this environment.
+
+## Example behavior and configuration
+{% if interface != "sink" %}
+The Source sends `message` once at startup on channel 0. A continuous source should observe results during normal operation and decide when to acknowledge its upstream system. Calling `send` does not prove delivery, and quiesce must not wait for pending results.
+{% endif %}{% if interface != "source" %}
+The Sink appends each message as a line in `outputFile`. Each batch is synchronized to the file before success is reported. A failed write can leave partial output, so replay may produce duplicates. Newlines inside messages are preserved. The file's parent directory must already exist and be writable by the plugin process.
+{% endif %}{% if interface == "source-and-sink" %}
+The combined plugin sends once and writes received messages to the output file. A Tenon flow must explicitly connect the two interfaces, either to each other or to other plugins.
+{% endif %}
+Tenon validates instance configuration against `config.schema.json`. For example:
+
+```json
+{
+{% if interface != "sink" %}  "message": "example message"{% if interface != "source" %},{% endif %}
+{% endif %}{% if interface != "source" %}  "outputFile": "/tmp/plugin-messages.txt"
+{% endif %}}
+```
+
+All shown fields are required; additional properties are rejected.{% if interface != "sink" %} `message` must be nonempty.{% endif %}{% if interface != "source" %} `outputFile` must be an absolute path.{% endif %}
+
+## Customize the plugin
+
+- Edit `package.metadata.tenon.program-name` in `Cargo.toml` to choose your reverse-domain program identity. The `interface` must match the implementation. Release versions come only from `package.version`.
+- Replace the example business logic under `src/`, keeping resource startup, quiesce, and close responsibilities explicit.
+- Update `config.schema.json` with your settings and constraints. Validate business requirements that a schema cannot express in your factory or `start` method.
+- Update the proto3 payload definitions under `proto/`. Keep the top-level `{% if interface == "source" %}SourceRecordPayload{% elsif interface == "sink" %}SinkRecordPayload{% else %}SourceRecordPayload` and `SinkRecordPayload{% endif %}` root names required by the declared interface.
+
+`build.rs` generates both the Rust payload types and a self-contained `payload.descriptor.pb` with source information. Keep `prost_path("::tenon_plugin_sdk::prost")` so generated code uses the SDK's Protobuf runtime. Keep the generated descriptor in Cargo's `OUT_DIR`.
+
+## Bundle contents
+
+`cargo tenon bundle` creates an archive with four regular files:
+
+```text
+config.schema.json
+manifest.json
+payload.descriptor.pb
+program
+```
+
+No extra resources or dynamic libraries are collected. Explain the target ABI and native-library requirements to the deployer, and validate the plugin with Tenon on that platform.
+
+To validate the contracts in an unpacked bundle without executing the plugin:
+
+```bash
+cargo tenon check /absolute/path/to/unpacked-bundle
+```
+
+`check` does not accept a Cargo project directory or a compressed archive. `cargo package` produces a registry source archive, not a Tenon installation bundle.

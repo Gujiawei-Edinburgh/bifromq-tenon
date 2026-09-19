@@ -1,0 +1,206 @@
+{
+  "formatVersion": 1,
+  "package": "tenon.core",
+  "service": {
+    "name": "PipelineControl",
+    "method": "Run",
+    "clientStreaming": true,
+    "serverStreaming": true,
+    "inputType": "PipelineToRunner",
+    "outputType": "RunnerToPipeline"
+  },
+  "diagnosticsService": {
+    "name": "PipelineDiagnostics",
+    "method": "Stream",
+    "clientStreaming": true,
+    "serverStreaming": true,
+    "inputType": "PipelineDiagnosticsToRunner",
+    "outputType": "RunnerToPipelineDiagnostics"
+  },
+  "messages": {
+    "PipelineToRunner": {
+      "attach": 1,
+      "status_snapshot": 2
+    },
+    "RunnerToPipeline": {
+      "bootstrap": 1,
+      "revision_plan": 2
+    },
+    "PipelineAttach": {
+      "launch_id": 1
+    },
+    "PipelineBootstrap": {
+      "revision_plan": 1,
+      "environment": 2
+    },
+    "PipelineRevisionPlan": {
+      "document_etag": 1,
+      "tenon_document_json": 2,
+      "plugin_programs": 3
+    },
+    "PluginProgramRuntime": {
+      "program_name": 1,
+      "exact_version": 2,
+      "program_directory": 3,
+      "command": 4,
+      "plugin_interface": 5,
+      "payload_descriptor_set": 6
+    },
+    "PipelineEnvironment": {
+      "pipeline_working_directory": 3,
+      "lua_limits": 5,
+      "retry_backoff": 6,
+      "reconfigure_timeout_ms": 7,
+      "metrics_node_id": 8,
+      "available_cpu_count": 9
+    },
+    "LuaLimits": {
+      "cpu_time_limit_ms": 1,
+      "memory_limit_bytes": 2
+    },
+    "RetryBackoff": {
+      "initial_delay_ms": 1,
+      "maximum_delay_ms": 2
+    },
+    "PipelineStatusSnapshot": {
+      "document_etag": 1,
+      "plugin_instances": 2
+    },
+    "PluginInstanceStatus": {
+      "id": 1,
+      "state": 2,
+      "last_error": 3
+    },
+    "ControlError": {
+      "code": 1,
+      "message": 2
+    },
+    "PipelineDiagnosticsToRunner": {
+      "attach": 1,
+      "batch": 2
+    },
+    "RunnerToPipelineDiagnostics": {
+      "interest": 1
+    },
+    "PipelineDiagnosticsAttach": {
+      "launch_id": 1
+    },
+    "PipelineDiagnosticsInterest": {
+      "channels": 1,
+      "plugin_instance_ids": 2
+    },
+    "FlowChannelDiagnosticSelector": {
+      "flow_id": 1,
+      "channel_index": 2
+    },
+    "PipelineDiagnosticBatch": {
+      "records": 1
+    },
+    "PipelineDiagnosticRecord": {
+      "channel": 1,
+      "plugin": 2
+    },
+    "ChannelDiagnosticRecord": {
+      "flow_id": 1,
+      "channel_index": 2,
+      "channel_instance_id": 3,
+      "observed_at_unix_millis": 4,
+      "text": 5,
+      "truncated": 6,
+      "invalid_utf8": 7,
+    "sequence": 8,
+      "lua_vm_instance_id": 9,
+      "kind": 10,
+      "phase": 11,
+      "code": 12
+    },
+    "PluginDiagnosticRecord": {
+      "plugin_instance_id": 1,
+      "plugin_process_instance_id": 2,
+      "observed_at_unix_millis": 3,
+      "text": 4,
+      "truncated": 5,
+      "invalid_utf8": 6,
+      "sequence": 7,
+      "stream": 8
+    },
+    "PipelineMetricsToRunner": {
+      "attach": 1,
+      "snapshot": 2
+    },
+    "PipelineMetricsAttach": {
+      "launch_id": 1
+    },
+    "PipelineMetricsSnapshot": {
+      "metrics": 1
+    },
+    "RunnerToPipelineMetrics": {
+      "include": 1
+    }
+  },
+  "oneofs": {
+    "PipelineToRunner": {
+      "message": [
+        "attach",
+        "status_snapshot"
+      ]
+    },
+    "RunnerToPipeline": {
+      "message": [
+        "bootstrap",
+        "revision_plan"
+      ]
+    },
+    "PipelineDiagnosticsToRunner": {
+      "message": [
+        "attach",
+        "batch"
+      ]
+    },
+    "PipelineDiagnosticRecord": {
+      "record": [
+        "channel",
+        "plugin"
+      ]
+    },
+    "PipelineMetricsToRunner": {
+      "message": [
+        "attach",
+        "snapshot"
+      ]
+    }
+  },
+  "enums": {
+    "ChannelDiagnosticKind": {
+      "CHANNEL_DIAGNOSTIC_KIND_PRINT": 0,
+      "CHANNEL_DIAGNOSTIC_KIND_ERROR": 1
+    },
+    "PluginInterface": {
+      "PLUGIN_INTERFACE_SOURCE": 0,
+      "PLUGIN_INTERFACE_SINK": 1,
+      "PLUGIN_INTERFACE_SOURCE_AND_SINK": 2
+    },
+    "PluginInstanceState": {
+      "PLUGIN_INSTANCE_STATE_STARTING": 0,
+      "PLUGIN_INSTANCE_STATE_RUNNING": 1,
+      "PLUGIN_INSTANCE_STATE_START_FAILED": 2,
+      "PLUGIN_INSTANCE_STATE_RESTART_BACKOFF": 3
+    },
+    "PluginDiagnosticStream": {
+      "PLUGIN_DIAGNOSTIC_STREAM_STDOUT": 0,
+      "PLUGIN_DIAGNOSTIC_STREAM_STDERR": 1
+    }
+  },
+  "reservedFieldNumbers": {},
+  "reservedFieldNames": {},
+  "reservedEnumNumbers": {},
+  "reservedEnumNames": {},
+  "metricsService": {
+    "name": "PipelineMetrics",
+    "method": "Stream",
+    "clientStreaming": true,
+    "serverStreaming": true,
+    "inputType": "PipelineMetricsToRunner",
+    "outputType": "RunnerToPipelineMetrics"
+  }
+}
