@@ -398,6 +398,37 @@ impl fmt::Display for ExactVersion {
     }
 }
 
+/// Identifies one exact Plugin Program version, shared by any instances using it.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginProgramIdentity {
+    program_name: ProgramName,
+    exact_version: ExactVersion,
+}
+
+impl PluginProgramIdentity {
+    /// Creates an identity from already validated components.
+    #[must_use]
+    pub const fn from_parts(program_name: ProgramName, exact_version: ExactVersion) -> Self {
+        Self {
+            program_name,
+            exact_version,
+        }
+    }
+
+    /// Returns the validated Program name.
+    #[must_use]
+    pub const fn program_name(&self) -> &ProgramName {
+        &self.program_name
+    }
+
+    /// Returns the validated exact version.
+    #[must_use]
+    pub const fn exact_version(&self) -> &ExactVersion {
+        &self.exact_version
+    }
+}
+
 /// A validated Sink Program type identity.
 ///
 /// The value is always the canonical `<programName>@<exactVersion>` pair. It

@@ -32,7 +32,7 @@ use std::rc::Rc;
 
 use super::ResourceAction;
 use super::identity::{RuntimeResourceIdentityRef, SinkContractIdRef};
-use crate::identifiers::{ExactVersion, FlowId, PluginInstanceId, ProgramName};
+use crate::identifiers::{FlowId, PluginInstanceId, PluginProgramIdentity};
 use crate::payload_contract::PayloadContractProjectionMaterial;
 use crate::pipeline::reconfigure::error::PipelineReconfigureError;
 use crate::pipeline::reconfigure::revision::{PipelineRevision, ProgramRuntime};
@@ -123,8 +123,7 @@ impl RuntimeResourceSpec<'_> {
                 else {
                     unreachable!("equal resource identities must have the same resource kind")
                 };
-                instance.program_name() == other_instance.program_name()
-                    && instance.exact_version() == other_instance.exact_version()
+                instance.program_identity() == other_instance.program_identity()
                     && instance.config() == other_instance.config()
                     && instance.has_same_startup_settings(other_instance)
                     && source_layout == other_source_layout
@@ -503,17 +502,13 @@ fn instance_projection<'a, 'index>(
 
 fn project_programs(
     model: &PipelineRevision,
-) -> Result<HashMap<(&ProgramName, &ExactVersion), Rc<ProgramProjection>>, PipelineReconfigureError>
-{
+) -> Result<HashMap<&PluginProgramIdentity, Rc<ProgramProjection>>, PipelineReconfigureError> {
     let mut projections = HashMap::new();
     projections
         .try_reserve(model.programs().len())
         .map_err(|_| PipelineReconfigureError::ResourceLimitExceeded)?;
-    for ((program_name, exact_version), program) in model.programs() {
-        let _ = projections.insert(
-            (program_name, exact_version),
-            Rc::new(project_program(program)),
-        );
+    for (identity, program) in model.programs() {
+        let _ = projections.insert(identity, Rc::new(project_program(program)));
     }
     Ok(projections)
 }
@@ -543,7 +538,7 @@ fn project_program(program: &ProgramRuntime) -> ProgramProjection {
 )]
 fn project_instances<'a>(
     model: &'a PipelineRevision,
-    programs: &HashMap<(&'a ProgramName, &'a ExactVersion), Rc<ProgramProjection>>,
+    programs: &HashMap<&'a PluginProgramIdentity, Rc<ProgramProjection>>,
     available_cpu_count: NonZeroUsize,
 ) -> Result<HashMap<&'a PluginInstanceId, InstanceProjection<'a>>, PipelineReconfigureError> {
     let mut source_layouts = HashMap::new();
@@ -568,7 +563,7 @@ fn project_instances<'a>(
         .map_err(|_| PipelineReconfigureError::ResourceLimitExceeded)?;
     for (instance_id, instance) in model.document().plugin_instances() {
         let program = programs
-            .get(&(instance.program_name(), instance.exact_version()))
+            .get(instance.program_identity())
             .expect("a received revision must retain every referenced Program material");
         let _ = instances.insert(
             instance_id,

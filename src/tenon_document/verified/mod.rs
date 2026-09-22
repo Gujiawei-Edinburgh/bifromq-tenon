@@ -34,7 +34,8 @@ use super::{SourceDelivery, UnverifiedTenonDocument};
 use crate::config::ScriptVmLimits;
 use crate::contracts::tenon_document::v1_schema_bytes;
 use crate::identifiers::{
-    ExactVersion, FlowId, PluginInstanceId, ProgramName, TenonDocumentId, validate_local_id,
+    ExactVersion, FlowId, PluginInstanceId, PluginProgramIdentity, ProgramName, TenonDocumentId,
+    validate_local_id,
 };
 use crate::lua::validate_tenon_document_source_syntax;
 use crate::strict_jsonc::parse_json;
@@ -467,8 +468,8 @@ fn ceil_decimal_product(ratio: &Number, cpu_count: u128) -> u128 {
 #[serde(rename_all = "camelCase")]
 /// One verified use of a Plugin Program with its authored configuration.
 pub struct PluginInstance {
-    program_name: ProgramName,
-    exact_version: ExactVersion,
+    #[serde(flatten)]
+    program_identity: PluginProgramIdentity,
     #[serde(skip_serializing_if = "Option::is_none")]
     extra_args: Option<ExtraArgs>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -477,14 +478,19 @@ pub struct PluginInstance {
 }
 
 impl PluginInstance {
+    /// Returns the exact Program identity shared by instances using this version.
+    pub fn program_identity(&self) -> &PluginProgramIdentity {
+        &self.program_identity
+    }
+
     /// Returns the referenced Program name.
     pub fn program_name(&self) -> &ProgramName {
-        &self.program_name
+        self.program_identity.program_name()
     }
 
     /// Returns the exact referenced Program version.
     pub fn exact_version(&self) -> &ExactVersion {
-        &self.exact_version
+        self.program_identity.exact_version()
     }
 
     /// Returns the unchanged authored Plugin configuration.
@@ -547,8 +553,8 @@ impl fmt::Debug for PluginInstance {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter
             .debug_struct("PluginInstance")
-            .field("program_name", &self.program_name)
-            .field("exact_version", &self.exact_version)
+            .field("program_name", self.program_identity.program_name())
+            .field("exact_version", self.program_identity.exact_version())
             .field("config", &"[REDACTED]")
             .finish()
     }
@@ -643,13 +649,15 @@ impl RawDocument {
             .into_iter()
             .map(|(id, mut instance)| {
                 let instance = PluginInstance {
-                    program_name: ProgramName::from_verified(
-                        serde_json::from_value(instance["programName"].take())
-                            .expect("Schema guarantees a string Program name"),
-                    ),
-                    exact_version: ExactVersion::from_verified(
-                        serde_json::from_value(instance["exactVersion"].take())
-                            .expect("Schema guarantees a string exact version"),
+                    program_identity: PluginProgramIdentity::from_parts(
+                        ProgramName::from_verified(
+                            serde_json::from_value(instance["programName"].take())
+                                .expect("Schema guarantees a string Program name"),
+                        ),
+                        ExactVersion::from_verified(
+                            serde_json::from_value(instance["exactVersion"].take())
+                                .expect("Schema guarantees a string exact version"),
+                        ),
                     ),
                     extra_args: serde_json::from_value(instance["extraArgs"].take())
                         .expect("Schema guarantees optional Instance arguments"),

@@ -18,8 +18,8 @@
  */
 
 use super::{
-    ExactVersion, FlowId, IdentifierParseError, PluginInstanceId, ProgramName, SinkContractId,
-    TenonDocumentId,
+    ExactVersion, FlowId, IdentifierParseError, PluginInstanceId, PluginProgramIdentity,
+    ProgramName, SinkContractId, TenonDocumentId,
 };
 use crate::contracts::tenon_document::v1_schema_bytes;
 use proptest::prelude::*;
@@ -285,4 +285,35 @@ proptest! {
         prop_assert_eq!(parsed_exact_version.to_string(), exact_version);
         prop_assert_eq!(parsed_sink_contract_id.to_string(), sink_contract_id);
     }
+}
+
+#[test]
+fn program_identity_keys_distinguish_names_and_exact_versions() -> io::Result<()> {
+    let identity = |name: &str, version: &str| -> io::Result<PluginProgramIdentity> {
+        Ok(PluginProgramIdentity::from_parts(
+            ProgramName::try_from(name).map_err(io::Error::other)?,
+            ExactVersion::try_from(version).map_err(io::Error::other)?,
+        ))
+    };
+    let first = identity("com.example.source", "1.0.0")?;
+    let next_version = identity("com.example.source", "1.0.1")?;
+    let other_program = identity("com.example.sink", "1.0.0")?;
+    let programs = std::collections::HashMap::from([
+        (first.clone(), 1),
+        (next_version.clone(), 2),
+        (other_program.clone(), 3),
+    ]);
+    assert_eq!(programs.len(), 3);
+    assert_eq!(
+        programs.get(&identity("com.example.source", "1.0.0")?),
+        Some(&1)
+    );
+    assert_eq!(programs.get(&next_version), Some(&2));
+    assert_eq!(programs.get(&other_program), Some(&3));
+    let borrowed: std::collections::HashMap<_, _> = programs.iter().collect();
+    assert_eq!(
+        borrowed.get(&identity("com.example.source", "1.0.0")?),
+        Some(&&1)
+    );
+    Ok(())
 }

@@ -24,7 +24,7 @@
 //! is dropped; wire material is built on demand rather than cached.
 
 use crate::contracts::core::{PluginInterface as ProtocolPluginInterface, PluginProgramRuntime};
-use crate::identifiers::{ExactVersion, ProgramName};
+use crate::identifiers::PluginProgramIdentity;
 use crate::payload_contract::PluginInterface;
 use crate::runner::plugin::store::PluginProgramEntry;
 use std::collections::HashMap;
@@ -34,22 +34,17 @@ use std::sync::Arc;
 /// Owns one reference per exact Program selected for Pipeline runtime material.
 #[derive(Debug)]
 pub(super) struct PipelineProgramSnapshot {
-    programs: HashMap<(ProgramName, ExactVersion), Arc<PluginProgramEntry>>,
+    programs: HashMap<PluginProgramIdentity, Arc<PluginProgramEntry>>,
 }
 
 impl PipelineProgramSnapshot {
     /// Retains the resolver's already selected, deduplicated Entry references.
     pub(super) fn retain<'a>(
-        entries: impl IntoIterator<
-            Item = (
-                (&'a ProgramName, &'a ExactVersion),
-                &'a Arc<PluginProgramEntry>,
-            ),
-        >,
+        entries: impl IntoIterator<Item = (&'a PluginProgramIdentity, &'a Arc<PluginProgramEntry>)>,
     ) -> Self {
         let programs = entries
             .into_iter()
-            .map(|((name, version), entry)| ((name.clone(), version.clone()), Arc::clone(entry)))
+            .map(|(identity, entry)| (identity.clone(), Arc::clone(entry)))
             .collect();
         Self { programs }
     }
@@ -60,20 +55,18 @@ impl PipelineProgramSnapshot {
         let mut runtimes: Vec<_> = self
             .programs
             .iter()
-            .map(
-                |((program_name, exact_version), program)| PluginProgramRuntime {
-                    program_name: program_name.as_str().to_owned(),
-                    exact_version: exact_version.as_str().to_owned(),
-                    program_directory: revision_absolute_utf8_path(program.directory()).to_owned(),
-                    command: program.command().to_vec(),
-                    plugin_interface: match program.interface() {
-                        PluginInterface::Source => ProtocolPluginInterface::Source,
-                        PluginInterface::Sink => ProtocolPluginInterface::Sink,
-                        PluginInterface::SourceAndSink => ProtocolPluginInterface::SourceAndSink,
-                    } as i32,
-                    payload_descriptor_set: program.payload_descriptor_bytes().to_vec(),
-                },
-            )
+            .map(|(identity, program)| PluginProgramRuntime {
+                program_name: identity.program_name().as_str().to_owned(),
+                exact_version: identity.exact_version().as_str().to_owned(),
+                program_directory: revision_absolute_utf8_path(program.directory()).to_owned(),
+                command: program.command().to_vec(),
+                plugin_interface: match program.interface() {
+                    PluginInterface::Source => ProtocolPluginInterface::Source,
+                    PluginInterface::Sink => ProtocolPluginInterface::Sink,
+                    PluginInterface::SourceAndSink => ProtocolPluginInterface::SourceAndSink,
+                } as i32,
+                payload_descriptor_set: program.payload_descriptor_bytes().to_vec(),
+            })
             .collect();
         runtimes.sort_unstable_by(|left, right| {
             (&left.program_name, &left.exact_version)

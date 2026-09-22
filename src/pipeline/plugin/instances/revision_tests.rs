@@ -309,10 +309,7 @@ fn launch_material<'a>(
         .ok_or("Instance is missing")?;
     let program = revision
         .programs()
-        .get(&(
-            instance.program_name().clone(),
-            instance.exact_version().clone(),
-        ))
+        .get(instance.program_identity())
         .ok_or("Program is missing")?;
     let working_directory = root.join("instances").join(id.as_str());
     std::fs::create_dir_all(&working_directory)?;
@@ -354,10 +351,7 @@ fn controlled_launch_material<'a>(
         .ok_or("Instance is missing")?;
     let program = revision
         .programs()
-        .get(&(
-            instance.program_name().clone(),
-            instance.exact_version().clone(),
-        ))
+        .get(instance.program_identity())
         .ok_or("Program is missing")?;
     Ok(ControlledPluginLaunch::new(
         launch,

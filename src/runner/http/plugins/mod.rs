@@ -322,13 +322,17 @@ pub(super) async fn delete_program(
 fn program_install_response(
     result: Result<PluginProgramInstallResult, PluginOperationFailure>,
 ) -> Response {
-    let (status, (program_name, exact_version)) = match result {
+    let (status, identity) = match result {
         Ok(PluginProgramInstallResult::Installed(identity)) => (StatusCode::CREATED, identity),
         Ok(PluginProgramInstallResult::Unchanged(identity)) => (StatusCode::NO_CONTENT, identity),
         Err(error) => return plugin_operation_failure_response(error),
     };
     RunnerHttpResponse::empty(status)
-        .with_location(format!("/plugins/{program_name}/{exact_version}"))
+        .with_location(format!(
+            "/plugins/{}/{}",
+            identity.program_name(),
+            identity.exact_version()
+        ))
         .into_response()
 }
 

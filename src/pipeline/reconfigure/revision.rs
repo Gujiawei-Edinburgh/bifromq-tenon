@@ -25,7 +25,7 @@
 //! It owns no process, Queue, task, or apply state.
 
 use crate::contracts::core::PipelineRevisionPlan;
-use crate::identifiers::{ExactVersion, PluginInstanceId, ProgramName};
+use crate::identifiers::{ExactVersion, PluginInstanceId, PluginProgramIdentity, ProgramName};
 use crate::payload_contract::PluginProgramPayloadContract;
 use crate::tenon_document::verified::VerifiedTenonDocument;
 use std::collections::HashMap;
@@ -37,7 +37,7 @@ pub(crate) struct PipelineRevision {
     // Runner hashes authored JSONC bytes, which this semantic Document cannot recover.
     document_etag: Box<str>,
     document: VerifiedTenonDocument,
-    programs: HashMap<(ProgramName, ExactVersion), ProgramRuntime>,
+    programs: HashMap<PluginProgramIdentity, ProgramRuntime>,
 }
 
 impl PipelineRevision {
@@ -51,7 +51,7 @@ impl PipelineRevision {
                 .into_iter()
                 .map(|program| {
                     (
-                        (
+                        PluginProgramIdentity::from_parts(
                             ProgramName::from_verified(program.program_name),
                             ExactVersion::from_verified(program.exact_version),
                         ),
@@ -76,7 +76,7 @@ impl PipelineRevision {
         &self.document
     }
 
-    pub(crate) fn programs(&self) -> &HashMap<(ProgramName, ExactVersion), ProgramRuntime> {
+    pub(crate) fn programs(&self) -> &HashMap<PluginProgramIdentity, ProgramRuntime> {
         &self.programs
     }
 
@@ -90,10 +90,7 @@ impl PipelineRevision {
     ) -> &ProgramRuntime {
         let instance = &self.document.plugin_instances()[instance_id];
         self.programs
-            .get(&(
-                instance.program_name().clone(),
-                instance.exact_version().clone(),
-            ))
+            .get(instance.program_identity())
             .expect("a received Plugin Instance must retain its Program material")
     }
 }

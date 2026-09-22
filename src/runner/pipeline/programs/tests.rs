@@ -19,7 +19,7 @@
 
 use super::PipelineProgramSnapshot;
 use crate::contracts::core::PluginInterface as ProtocolPluginInterface;
-use crate::identifiers::{ExactVersion, ProgramName};
+use crate::identifiers::{ExactVersion, PluginProgramIdentity, ProgramName};
 use crate::payload_contract::PluginInterface;
 use crate::runner::plugin::package::tests::{
     equivalent_source_program_package, valid_program_package, valid_source_program_package,
@@ -71,7 +71,7 @@ fn all_interfaces_share_one_sorted_runtime_per_exact_program() -> io::Result<()>
     ]) {
         let selected = identity(&runtime.program_name)?;
         let entry = store
-            .lookup(&selected.0, &selected.1)
+            .lookup(selected.program_name(), selected.exact_version())
             .ok_or_else(|| io::Error::other("selected Program is missing"))?;
         assert_eq!(runtime.exact_version, "1.0.0");
         assert_eq!(Path::new(&runtime.program_directory), entry.directory());
@@ -107,23 +107,31 @@ fn only_the_last_snapshot_release_allows_selected_program_uninstall() -> io::Res
     let source_directory = directory.path().join("com.example.source/1.0.0");
 
     assert!(matches!(
-        store.uninstall(&source.0, &source.1),
+        store.uninstall(source.program_name(), source.exact_version()),
         Err(PluginStoreError::ProgramInUse),
     ));
     assert!(source_directory.is_dir());
-    assert!(store.lookup(&source.0, &source.1).is_some());
+    assert!(
+        store
+            .lookup(source.program_name(), source.exact_version())
+            .is_some()
+    );
     assert_eq!(
         store
-            .uninstall(&sink.0, &sink.1)
+            .uninstall(sink.program_name(), sink.exact_version())
             .map_err(io::Error::other)?,
         PluginUninstallOutcome::Uninstalled,
     );
-    assert!(store.lookup(&sink.0, &sink.1).is_none());
+    assert!(
+        store
+            .lookup(sink.program_name(), sink.exact_version())
+            .is_none()
+    );
     assert!(!directory.path().join("com.example.sink/1.0.0").exists());
 
     drop(first);
     assert!(matches!(
-        store.uninstall(&source.0, &source.1),
+        store.uninstall(source.program_name(), source.exact_version()),
         Err(PluginStoreError::ProgramInUse),
     ));
     assert_eq!(fs::read(source_directory.join("bin/start"))?, b"program");
@@ -131,11 +139,15 @@ fn only_the_last_snapshot_release_allows_selected_program_uninstall() -> io::Res
     drop(second);
     assert_eq!(
         store
-            .uninstall(&source.0, &source.1)
+            .uninstall(source.program_name(), source.exact_version())
             .map_err(io::Error::other)?,
         PluginUninstallOutcome::Uninstalled,
     );
-    assert!(store.lookup(&source.0, &source.1).is_none());
+    assert!(
+        store
+            .lookup(source.program_name(), source.exact_version())
+            .is_none()
+    );
     assert!(!source_directory.exists());
     Ok(())
 }
@@ -160,19 +172,23 @@ fn equivalent_install_and_unrelated_changes_preserve_snapshot_material_and_reten
         .map_err(io::Error::other)?;
     assert_eq!(snapshot.runtimes(), original_runtimes);
     assert!(matches!(
-        store.uninstall(&source.0, &source.1),
+        store.uninstall(source.program_name(), source.exact_version()),
         Err(PluginStoreError::ProgramInUse),
     ));
 
     drop(snapshot);
     assert_eq!(
         store
-            .uninstall(&source.0, &source.1)
+            .uninstall(source.program_name(), source.exact_version())
             .map_err(io::Error::other)?,
         PluginUninstallOutcome::Uninstalled,
     );
     let sink = identity("com.example.sink")?;
-    assert!(store.lookup(&sink.0, &sink.1).is_some());
+    assert!(
+        store
+            .lookup(sink.program_name(), sink.exact_version())
+            .is_some()
+    );
     Ok(())
 }
 
@@ -183,8 +199,8 @@ fn empty_store() -> io::Result<(TempDir, PluginProgramStore)> {
     Ok((directory, store))
 }
 
-fn identity(program_name: &str) -> io::Result<(ProgramName, ExactVersion)> {
-    Ok((
+fn identity(program_name: &str) -> io::Result<PluginProgramIdentity> {
+    Ok(PluginProgramIdentity::from_parts(
         ProgramName::try_from(program_name.to_owned()).map_err(io::Error::other)?,
         ExactVersion::try_from(String::from("1.0.0")).map_err(io::Error::other)?,
     ))
@@ -192,15 +208,15 @@ fn identity(program_name: &str) -> io::Result<(ProgramName, ExactVersion)> {
 
 fn capture_programs(
     store: &PluginProgramStore,
-    identities: impl IntoIterator<Item = (ProgramName, ExactVersion)>,
+    identities: impl IntoIterator<Item = PluginProgramIdentity>,
 ) -> io::Result<PipelineProgramSnapshot> {
     let identities: Vec<_> = identities.into_iter().collect();
     let programs = identities
         .iter()
-        .map(|(name, version)| {
+        .map(|identity| {
             store
-                .lookup(name, version)
-                .map(|entry| ((name, version), entry))
+                .lookup(identity.program_name(), identity.exact_version())
+                .map(|entry| (identity, entry))
                 .ok_or_else(|| io::Error::other("Required Program fixture is absent"))
         })
         .collect::<io::Result<HashMap<_, _>>>()?;

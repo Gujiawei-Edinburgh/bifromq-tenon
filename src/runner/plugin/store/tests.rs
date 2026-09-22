@@ -24,7 +24,7 @@ use super::{
     PluginProgramEntry, PluginProgramStore, PluginStoreError, PluginUninstallOutcome,
     PublicationFilesystem,
 };
-use crate::identifiers::{ExactVersion, ProgramName};
+use crate::identifiers::{ExactVersion, PluginProgramIdentity, ProgramName};
 use crate::payload_contract::PluginInterface;
 use crate::runner::plugin::package::tests::STAGING_DIRECTORY_PREFIX;
 use crate::runner::plugin::package::tests::{
@@ -50,7 +50,10 @@ fn first_install_publishes_disk_and_memory_in_one_store_mutation() -> io::Result
     let PluginProgramInstallResult::Installed(identity) = outcome else {
         return Err(io::Error::other("first install was reported as unchanged"));
     };
-    assert_eq!(identity, (source_program_name()?, exact_version()?));
+    assert_eq!(
+        identity,
+        PluginProgramIdentity::from_parts(source_program_name()?, exact_version()?)
+    );
     let entry = available_entry(&store, "com.example.source")?;
 
     assert_eq!(entry.directory(), root.join("com.example.source/1.0.0"));
@@ -106,7 +109,10 @@ fn equivalent_retry_reuses_the_same_entry_arc() -> io::Result<()> {
         ));
     };
 
-    assert_eq!(identity, (source_program_name()?, exact_version()?));
+    assert_eq!(
+        identity,
+        PluginProgramIdentity::from_parts(source_program_name()?, exact_version()?)
+    );
     assert!(Arc::ptr_eq(
         &first,
         available_entry(&store, "com.example.source")?
@@ -895,7 +901,10 @@ fn java_target_bundles_install_idempotently_and_recover() -> io::Result<()> {
         let PluginProgramInstallResult::Installed(identity) = outcome else {
             return Err(io::Error::other("generated Java Program was not installed"));
         };
-        assert_eq!(identity, (program_name.clone(), version.clone()));
+        assert_eq!(
+            identity,
+            PluginProgramIdentity::from_parts(program_name.clone(), version.clone())
+        );
         let entry = store
             .lookup(&program_name, &version)
             .cloned()
@@ -918,7 +927,10 @@ fn java_target_bundles_install_idempotently_and_recover() -> io::Result<()> {
                 "generated Java Program was installed twice",
             ));
         };
-        assert_eq!(identity, (program_name.clone(), version.clone()));
+        assert_eq!(
+            identity,
+            PluginProgramIdentity::from_parts(program_name.clone(), version.clone())
+        );
         assert!(Arc::ptr_eq(
             &entry,
             store

@@ -67,41 +67,46 @@ impl RuntimeResolver {
         let mut references: HashMap<_, Vec<_>> = HashMap::new();
         for (id, instance) in document.plugin_instances() {
             references
-                .entry((instance.program_name(), instance.exact_version()))
+                .entry(instance.program_identity())
                 .or_default()
                 .push(id);
         }
         let mut references: Vec<_> = references.into_iter().collect();
-        references.sort_unstable_by_key(|((name, version), _)| (name.as_str(), version.as_str()));
+        references.sort_unstable_by_key(|(identity, _)| {
+            (
+                identity.program_name().as_str(),
+                identity.exact_version().as_str(),
+            )
+        });
         let programs: HashMap<_, _> = references
             .into_iter()
-            .filter_map(|((name, version), ids)| match store.lookup(name, version) {
-                Some(entry) if !entry.platforms().contains(&Platform::CURRENT) => {
-                    issues.push(RuntimeResolutionIssue::PluginPlatformMismatch {
-                        program_name: name.clone(),
-                        exact_version: version.clone(),
-                        platforms: entry.platforms().into(),
-                        current_platform: Platform::CURRENT,
-                        plugin_instance_ids: ids.into_iter().cloned().collect(),
-                    });
-                    None
-                }
-                Some(entry) => Some(((name, version), entry)),
-                None => {
-                    issues.push(RuntimeResolutionIssue::PluginProgramMissing {
-                        program_name: name.clone(),
-                        exact_version: version.clone(),
-                        plugin_instance_ids: ids.into_iter().cloned().collect(),
-                    });
-                    None
+            .filter_map(|(identity, ids)| {
+                match store.lookup(identity.program_name(), identity.exact_version()) {
+                    Some(entry) if !entry.platforms().contains(&Platform::CURRENT) => {
+                        issues.push(RuntimeResolutionIssue::PluginPlatformMismatch {
+                            program_name: identity.program_name().clone(),
+                            exact_version: identity.exact_version().clone(),
+                            platforms: entry.platforms().into(),
+                            current_platform: Platform::CURRENT,
+                            plugin_instance_ids: ids.into_iter().cloned().collect(),
+                        });
+                        None
+                    }
+                    Some(entry) => Some((identity, entry)),
+                    None => {
+                        issues.push(RuntimeResolutionIssue::PluginProgramMissing {
+                            program_name: identity.program_name().clone(),
+                            exact_version: identity.exact_version().clone(),
+                            plugin_instance_ids: ids.into_iter().cloned().collect(),
+                        });
+                        None
+                    }
                 }
             })
             .collect();
         let program_for_instance = |id: &PluginInstanceId| {
             let instance = &document.plugin_instances()[id];
-            programs
-                .get(&(instance.program_name(), instance.exact_version()))
-                .copied()
+            programs.get(instance.program_identity()).copied()
         };
 
         // These borrowed groups exist only during validation, never in the plan.

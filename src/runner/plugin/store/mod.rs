@@ -37,7 +37,7 @@ use super::package::{
 };
 use super::platform::Platform;
 use crate::error::ErrorChain;
-use crate::identifiers::{ExactVersion, ProgramName};
+use crate::identifiers::{ExactVersion, PluginProgramIdentity, ProgramName};
 use crate::payload_contract::{
     PluginInterface, PluginProgramPayloadContract, PluginProgramPayloadContractProjection,
 };
@@ -51,8 +51,6 @@ use std::fs;
 use std::io::{self, Read};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-
-type PluginProgramIdentity = (ProgramName, ExactVersion);
 
 /// Installation disposition and the validated identity, without an execution lease.
 #[derive(Debug)]
@@ -128,8 +126,10 @@ impl PluginProgramStore {
         program_name: &ProgramName,
         exact_version: &ExactVersion,
     ) -> Option<&Arc<PluginProgramEntry>> {
-        self.programs
-            .get(&(program_name.clone(), exact_version.clone()))
+        self.programs.get(&PluginProgramIdentity::from_parts(
+            program_name.clone(),
+            exact_version.clone(),
+        ))
     }
 
     /// Iterates only validated Programs without consulting the filesystem.
@@ -138,7 +138,7 @@ impl PluginProgramStore {
     ) -> impl Iterator<Item = (&ProgramName, &ExactVersion, &Arc<PluginProgramEntry>)> {
         self.programs
             .iter()
-            .map(|((program_name, exact_version), entry)| (program_name, exact_version, entry))
+            .map(|(identity, entry)| (identity.program_name(), identity.exact_version(), entry))
     }
 
     fn recover_with_filesystem(
@@ -174,7 +174,7 @@ impl PluginProgramStore {
                 match recovered {
                     Ok((exact_version, installed)) => {
                         store.programs.insert(
-                            (program_name.clone(), exact_version),
+                            PluginProgramIdentity::from_parts(program_name.clone(), exact_version),
                             Arc::new(program_entry(target, installed)),
                         );
                     }
@@ -214,13 +214,17 @@ impl PluginProgramStore {
             return Err(PluginStoreError::PlatformMismatch { platforms });
         }
         let program_name = staged.program_name().clone();
-        let identity = (program_name.clone(), staged.exact_version().clone());
+        let identity =
+            PluginProgramIdentity::from_parts(program_name.clone(), staged.exact_version().clone());
         let parent = self.directory.join(program_name.as_str());
         let target = parent.join(staged.exact_version().as_str());
 
         let namespace_presence = inspect_program_namespace(&parent)?;
         if matches!(namespace_presence, ProgramNamespacePresence::Absent)
-            && self.programs.keys().any(|(name, _)| name == &program_name)
+            && self
+                .programs
+                .keys()
+                .any(|identity| identity.program_name() == &program_name)
         {
             return Err(PluginStoreError::StoreIntegrityInvalid { path: parent });
         }
@@ -271,7 +275,8 @@ impl PluginProgramStore {
         exact_version: &ExactVersion,
         publication: &impl PublicationFilesystem,
     ) -> Result<PluginUninstallOutcome, PluginStoreError> {
-        let identity = (program_name.clone(), exact_version.clone());
+        let identity =
+            PluginProgramIdentity::from_parts(program_name.clone(), exact_version.clone());
         let Some(entry) = self.programs.get_mut(&identity) else {
             return Ok(PluginUninstallOutcome::NotFound);
         };

@@ -28,7 +28,9 @@ use std::error::Error;
 use std::process::ExitCode;
 
 pub use config::{HttpTlsConfig, RunnerConfig, ScriptVmLimits, ScriptVmLimitsError};
-pub use identifiers::{ExactVersion, FlowId, PluginInstanceId, ProgramName, TenonDocumentId};
+pub use identifiers::{
+    ExactVersion, FlowId, PluginInstanceId, PluginProgramIdentity, ProgramName, TenonDocumentId,
+};
 pub use runner::extensions::{
     AllowAll, DocumentProtection, ExecutionDenied, ExecutionPermit, ExecutionPolicy,
     ExecutionScope, HttpApiAuthorization, HttpAuthRejection, NoHttpAuth, Plaintext, RunnerHooks,
