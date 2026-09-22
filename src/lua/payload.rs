@@ -1057,6 +1057,7 @@ fn tracked_payload_tree_memory_usage(message: &DynamicMessage) -> LuaApiResult<u
         .ok_or(LuaApiFailure::MemoryExceeded)
 }
 
+#[cfg(debug_assertions)]
 fn built_payload_memory_usage(message: &DynamicMessage) -> LuaApiResult<usize> {
     message_memory_usage(message)?
         .checked_add(size_of::<BuiltPayload>().saturating_sub(size_of::<DynamicMessage>()))
