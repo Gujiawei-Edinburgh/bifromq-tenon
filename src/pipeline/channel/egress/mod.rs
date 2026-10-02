@@ -28,11 +28,11 @@
 use std::collections::{BTreeMap, HashMap};
 use std::error::Error;
 use std::fmt;
+use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Arc;
 
 use super::metrics::{ChannelMetrics, TargetMetrics, WaitKind};
-use crate::contracts::sink::EgressRecord;
 use crate::contracts::sink::EncodedEgressRecord;
 use crate::identifiers::{PluginInstanceId, SinkContractId};
 use tenon_ipc::bell::{BellRegion, LoopBell, WaitOutcome};
@@ -127,12 +127,11 @@ impl EgressRoute {
 
     pub(super) fn send(
         &mut self,
-        payload: Vec<u8>,
+        record: EncodedEgressRecord,
         metrics: &ChannelMetrics,
         stopped: impl Fn() -> bool,
     ) -> Result<SendOutcome, EgressError> {
-        let payload_bytes = payload.len();
-        let record = EncodedEgressRecord::from(&EgressRecord { payload });
+        let payload_bytes = record.payload().len();
         for target in self.targets.values_mut() {
             let mut wait = metrics.wait(WaitKind::EgressCapacity(&target.metrics));
             loop {
@@ -157,9 +156,13 @@ impl EgressRoute {
         for (instance, target) in &mut self.targets {
             let outcome = target
                 .writer
-                .try_write_observed(record.as_bytes(), || {
-                    metrics.egress(&target.metrics, payload_bytes);
-                })
+                .try_write_with(
+                    record.len(),
+                    |destination| Write::write_all(destination, record.as_bytes()),
+                    || {
+                        metrics.egress(&target.metrics, payload_bytes);
+                    },
+                )
                 .map_err(EgressError)?;
             assert!(
                 matches!(outcome, WriteOutcome::Committed(_)),

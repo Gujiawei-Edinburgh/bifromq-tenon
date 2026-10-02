@@ -281,12 +281,12 @@ fn built_payload(vm: &LuaVm, global_name: &str) -> io::Result<AnyUserData> {
 fn payload_boundary(boundary: &EmitBoundary) -> io::Result<(&SinkContractId, &[u8])> {
     let EmitBoundary::Payload {
         sink_contract_id,
-        payload,
+        record,
     } = boundary
     else {
         return Err(io::Error::other("Expected a payload emit boundary"));
     };
-    Ok((sink_contract_id, payload))
+    Ok((sink_contract_id, record.payload()))
 }
 
 fn protobuf_field(
@@ -575,6 +575,54 @@ fn main_can_create_and_build_a_payload() -> io::Result<()> {
 }
 
 #[test]
+fn emit_frames_empty_payload_and_varint_length_boundaries() -> io::Result<()> {
+    use crate::contracts::sink::EgressRecord;
+
+    let descriptor = lua_builder_contract()?;
+    let mut vm = load_vm_with_contracts(
+        r#"
+        local builder = registry:getBuilder("com.example.lua-builder@1.0.0")
+        function main(event)
+            for _, size in ipairs({0, 125, 126, 16380, 16381}) do
+                builder:setBody(string.rep("x", size))
+                emit(builder:build())
+            end
+        end
+        "#,
+        limits()?,
+        lua_builder_contracts()?,
+    )
+    .map_err(test_error)?;
+    let outcome = vm.call_timer(1);
+    outcome.result().map_err(test_error_ref)?;
+    let cases: &[(usize, usize, &[u8])] = &[
+        (0, 0, &[0x0a, 0x00]),
+        (125, 127, &[0x0a, 0x7f]),
+        (126, 128, &[0x0a, 0x80, 0x01]),
+        (16380, 16383, &[0x0a, 0xff, 0x7f]),
+        (16381, 16384, &[0x0a, 0x80, 0x80, 0x01]),
+    ];
+    assert_eq!(outcome.emit_boundaries().len(), cases.len());
+    for (boundary, &(body_len, payload_len, header)) in outcome.emit_boundaries().iter().zip(cases)
+    {
+        let EmitBoundary::Payload { record, .. } = boundary else {
+            return Err(io::Error::other("Expected a framed payload"));
+        };
+        assert!(record.as_bytes().starts_with(header));
+        assert_eq!(record.len(), header.len() + payload_len);
+        let decoded = EgressRecord::decode(record.as_bytes()).map_err(io::Error::other)?;
+        assert_eq!(decoded.payload, record.payload());
+        let payload = DynamicMessage::decode(descriptor.clone(), decoded.payload.as_slice())
+            .map_err(io::Error::other)?;
+        assert_eq!(
+            protobuf_field(&payload, "body")?,
+            ProtobufValue::Bytes(vec![b'x'; body_len].into())
+        );
+    }
+    Ok(())
+}
+
+#[test]
 fn emit_checks_complete_record_size_and_preserves_accepted_boundaries() -> io::Result<()> {
     let registry = HashMap::from([(
         SinkContractId::try_from("com.example.lua-builder@1.0.0").map_err(io::Error::other)?,
@@ -719,19 +767,17 @@ fn payload_and_completion_only_emits_preserve_one_ordered_prefix() -> io::Result
     );
     let [
         EmitBoundary::CompletionOnly,
-        EmitBoundary::Payload { payload: first, .. },
+        EmitBoundary::Payload { record: first, .. },
         EmitBoundary::CompletionOnly,
-        EmitBoundary::Payload {
-            payload: second, ..
-        },
+        EmitBoundary::Payload { record: second, .. },
     ] = outcome.emit_boundaries()
     else {
         return Err(io::Error::other(
             "main should preserve four ordered emit boundaries",
         ));
     };
-    for (payload, expected_label) in [(first, "first"), (second, "second")] {
-        let decoded = DynamicMessage::decode(root_descriptor.clone(), payload.as_slice())
+    for (record, expected_label) in [(first, "first"), (second, "second")] {
+        let decoded = DynamicMessage::decode(root_descriptor.clone(), record.payload())
             .map_err(io::Error::other)?;
         assert_eq!(
             protobuf_field(&decoded, "label")?,
@@ -747,15 +793,35 @@ fn emit_uses_canonical_field_and_map_key_order() -> io::Result<()> {
         r#"
         local function fill(builder, reverse)
             if reverse then
+                builder:setExplicitZero(0)
+                builder:setIntegerChoice(7)
                 builder:putCounts("z", 9)
                 builder:putCounts("a", 1)
                 builder:putChildrenById("10"):setName("ten")
                 builder:putChildrenById("2"):setName("two")
+                local repeated = builder:addChildrenBuilder()
+                repeated:setValue("x")
+                repeated:setName("c")
+                local child = builder:getChildBuilder()
+                child:setValue(string.char(0, 255))
+                child:setName("k")
+                builder:setLabel("r")
+                builder:setEnabled(true)
             else
+                builder:setEnabled(true)
+                builder:setLabel("r")
+                local child = builder:getChildBuilder()
+                child:setName("k")
+                child:setValue(string.char(0, 255))
+                local repeated = builder:addChildrenBuilder()
+                repeated:setName("c")
+                repeated:setValue("x")
                 builder:putChildrenById("2"):setName("two")
                 builder:putChildrenById("10"):setName("ten")
                 builder:putCounts("a", 1)
                 builder:putCounts("z", 9)
+                builder:setIntegerChoice(7)
+                builder:setExplicitZero(0)
             end
         end
 
@@ -781,9 +847,11 @@ fn emit_uses_canonical_field_and_map_key_order() -> io::Result<()> {
     let (_, first) = payload_boundary(first)?;
     let (_, second) = payload_boundary(second)?;
     let expected = [
-        0x72, 0x05, 0x0a, 0x01, b'a', 0x10, 0x01, 0x72, 0x05, 0x0a, 0x01, b'z', 0x10, 0x09, 0x7a,
-        0x09, 0x08, 0x02, 0x12, 0x05, 0x0a, 0x03, b't', b'w', b'o', 0x7a, 0x09, 0x08, 0x0a, 0x12,
-        0x05, 0x0a, 0x03, b't', b'e', b'n',
+        0x08, 0x01, 0x42, 0x01, b'r', 0x5a, 0x07, 0x0a, 0x01, b'k', 0x12, 0x02, 0x00, 0xff, 0x6a,
+        0x06, 0x0a, 0x01, b'c', 0x12, 0x01, b'x', 0x72, 0x05, 0x0a, 0x01, b'a', 0x10, 0x01, 0x72,
+        0x05, 0x0a, 0x01, b'z', 0x10, 0x09, 0x7a, 0x09, 0x08, 0x02, 0x12, 0x05, 0x0a, 0x03, b't',
+        b'w', b'o', 0x7a, 0x09, 0x08, 0x0a, 0x12, 0x05, 0x0a, 0x03, b't', b'e', b'n', 0x88, 0x01,
+        0x07, 0x98, 0x01, 0x00,
     ];
     assert_eq!(first, expected);
     assert_eq!(second, expected);
@@ -4266,6 +4334,103 @@ fn source_payload_projects_every_supported_protobuf_shape() -> io::Result<()> {
 }
 
 #[test]
+fn source_uint64_values_remain_exact_in_scalars_lists_and_map_keys() -> io::Result<()> {
+    let descriptor = compile_payload_contract_fixture(
+        "tenon-lua-uint64-test",
+        "contracts/source/test-fixtures/lua-uint64",
+        "source_record_payload.proto",
+    )?;
+    let contract = PluginProgramPayloadContract::parse(descriptor, PluginInterface::Source)
+        .map_err(io::Error::other)?
+        .source_root_message()
+        .ok_or_else(|| io::Error::other("Source fixture root is missing"))?;
+    let mut vm = LuaVm::load(
+        r#"
+        local expected = {
+            "0", "9", "10", "99", "100", "9223372036854775807",
+            "9223372036854775808", "18446744073709551615", "18446744073709551615"
+        }
+        local saved
+        calls = 0
+        function main(event)
+            calls = calls + 1
+            local payload = event.payload
+            local current = expected[(calls - 1) % #expected + 1]
+            assert(payload.unsigned64 == current)
+            assert(payload.fixed64 == current)
+            for _, field in ipairs({"unsignedValues", "fixedValues"}) do
+                assert(#payload[field] == #expected)
+                for index, value in ipairs(expected) do
+                    assert(payload[field][index] == value)
+                end
+            end
+            for _, value in ipairs(expected) do
+                assert(payload.byId[value] == value)
+            end
+            saved = saved or payload
+            assert(saved.unsigned64 == "0")
+            assert(saved.fixed64 == "0")
+        end
+        "#,
+        limits()?,
+        NonZeroU64::new(262_144)
+            .ok_or_else(|| io::Error::other("test record limit must be non-zero"))?,
+        contract.clone(),
+        HashMap::new(),
+        None,
+        || false,
+    )
+    .map_err(test_error)?;
+    let values = [
+        0,
+        9,
+        10,
+        99,
+        100,
+        i64::MAX as u64,
+        1_u64 << 63,
+        u64::MAX,
+        u64::MAX,
+    ];
+    let mut message = DynamicMessage::new(contract);
+    for field in ["unsigned_values", "fixed_values"] {
+        set_protobuf_field(
+            &mut message,
+            field,
+            ProtobufValue::List(values.iter().copied().map(ProtobufValue::U64).collect()),
+        )?;
+    }
+    set_protobuf_field(
+        &mut message,
+        "by_id",
+        ProtobufValue::Map(
+            values
+                .iter()
+                .map(|&value| (MapKey::U64(value), ProtobufValue::U64(value)))
+                .collect(),
+        ),
+    )?;
+    for _ in 0..2 {
+        for value in values {
+            for field in ["unsigned_64", "fixed_64"] {
+                set_protobuf_field(&mut message, field, ProtobufValue::U64(value))?;
+            }
+            call_source(&mut vm, 73, message.encode_to_vec())?
+                .into_result_without_emit_boundaries()
+                .map_err(test_error)?;
+        }
+        vm.lua.gc_collect().map_err(mlua_test_error)?;
+    }
+    assert_eq!(
+        vm.environment_values
+            .raw_get::<i64>("calls")
+            .map_err(mlua_test_error)?,
+        18
+    );
+    Ok(())
+}
+
+#[test]
 fn source_payload_preserves_proto3_default_and_presence_semantics() -> io::Result<()> {
     let mut vm = load_vm(
         r#"
@@ -4432,7 +4597,15 @@ fn script_can_retain_an_old_event_across_main_calls() -> io::Result<()> {
                 return
             end
 
-            assert(event.type == "timer")
+            if calls == 2 then
+                assert(event.type == "source")
+                assert(event.payload.deviceId == "device-8")
+                assert(#event.payload.children == 0)
+                assert(#event.payload.registers == 1)
+                assert(event.payload.registers[1] == 23)
+            else
+                assert(event.type == "timer")
+            end
             assert(saved.type == "source")
             assert(saved.payload.deviceId == "device-7")
             assert(saved.payload.body == string.char(0, 128, 255))
@@ -4441,7 +4614,9 @@ fn script_can_retain_an_old_event_across_main_calls() -> io::Result<()> {
             assert(
                 json.encode(saved.payload.registers) == '[7,11]'
             )
-            saved = nil
+            if calls == 3 then
+                saved = nil
+            end
         end
         "#,
         limits()?,
@@ -4453,7 +4628,22 @@ fn script_can_retain_an_old_event_across_main_calls() -> io::Result<()> {
         .into_result_without_emit_boundaries()
         .map_err(test_error)?;
     drop(source);
-    vm.call_timer(1_700_000_000_124)
+    let mut next_source = full_source_message(&lua_source_contract()?)?;
+    for (name, value) in [
+        ("device_id", ProtobufValue::String(String::from("device-8"))),
+        ("children", ProtobufValue::List(Vec::new())),
+        (
+            "registers",
+            ProtobufValue::List(vec![ProtobufValue::U32(23)]),
+        ),
+    ] {
+        set_protobuf_field(&mut next_source, name, value)?;
+    }
+    call_source(&mut vm, 1_700_000_000_124, next_source.encode_to_vec())?
+        .into_result_without_emit_boundaries()
+        .map_err(test_error)?;
+    vm.lua.gc_collect().map_err(mlua_test_error)?;
+    vm.call_timer(1_700_000_000_125)
         .into_result_without_emit_boundaries()
         .map_err(test_error)?;
 
@@ -4461,8 +4651,50 @@ fn script_can_retain_an_old_event_across_main_calls() -> io::Result<()> {
         vm.environment_values
             .raw_get::<i64>("calls")
             .map_err(|_| io::Error::other("call counter must remain readable"))?,
-        2
+        3
     );
+    Ok(())
+}
+
+#[test]
+fn readonly_faults_and_callback_lifetimes_are_isolated_between_vms() -> io::Result<()> {
+    let script = r#"
+        function main(event)
+            assert(#event.payload.registers == 2)
+            if event.timestamp == 2 then
+                pcall(function() event.payload.registers[1] = 99 end)
+            end
+        end
+    "#;
+    let mut first = load_vm(script, limits()?).map_err(test_error)?;
+    let mut second = load_vm(script, limits()?).map_err(test_error)?;
+    let first_fault = Rc::downgrade(&first.fatal_fault);
+    let source = full_source_payload()?;
+
+    let Err(error) =
+        call_source(&mut first, 2, source.clone())?.into_result_without_emit_boundaries()
+    else {
+        return Err(io::Error::other(
+            "readonly write must invalidate the first VM",
+        ));
+    };
+    assert_eq!(error.kind(), LuaVmErrorKind::SandboxViolation);
+    call_source(&mut second, 1, source.clone())?
+        .into_result_without_emit_boundaries()
+        .map_err(test_error)?;
+    drop(first);
+    assert!(first_fault.upgrade().is_none());
+
+    call_source(&mut second, 1, source.clone())?
+        .into_result_without_emit_boundaries()
+        .map_err(test_error)?;
+    let Err(error) = call_source(&mut second, 2, source)?.into_result_without_emit_boundaries()
+    else {
+        return Err(io::Error::other(
+            "readonly write must invalidate the second VM",
+        ));
+    };
+    assert_eq!(error.kind(), LuaVmErrorKind::SandboxViolation);
     Ok(())
 }
 
@@ -5004,12 +5236,13 @@ fn stops_memory_exhaustion_even_inside_protected_calls() -> io::Result<()> {
 
 #[test]
 fn dropping_vm_releases_the_embedded_lua_state() -> io::Result<()> {
-    let weak = {
+    let (weak, fault) = {
         let vm = load_vm("function main(event) end", limits()?).map_err(test_error)?;
-        vm.lua.weak()
+        (vm.lua.weak(), Rc::downgrade(&vm.fatal_fault))
     };
 
     assert!(weak.try_upgrade().is_none());
+    assert!(fault.upgrade().is_none());
     Ok(())
 }
 

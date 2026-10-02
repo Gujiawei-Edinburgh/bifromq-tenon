@@ -246,18 +246,26 @@ impl IngressQueuePair {
                 "admission backpressure is local to the Source SDK, never a Pipeline completion"
             ),
         };
-        let encoded = IngressCompletion {
+        let completion = IngressCompletion {
             record_id,
             status: status as i32,
-        }
-        .encode_to_vec();
+        };
+        let encoded_len = completion.encoded_len();
         loop {
             let outcome = self
                 .completion
-                .try_write_observed(&encoded, || {
-                    wait.ready();
-                    metrics.completion(result);
-                })
+                .try_write_with(
+                    encoded_len,
+                    |destination| {
+                        completion
+                            .encode(destination)
+                            .map_err(std::io::Error::other)
+                    },
+                    || {
+                        wait.ready();
+                        metrics.completion(result);
+                    },
+                )
                 .map_err(IngressQueueError::CompletionQueue)?;
             match outcome {
                 WriteOutcome::Committed(_) => {
@@ -265,7 +273,7 @@ impl IngressQueuePair {
                 }
                 WriteOutcome::Full => {
                     wait.blocked();
-                    match self.completion.wait_writable(encoded.len()) {
+                    match self.completion.wait_writable(encoded_len) {
                         Err(source) => {
                             return Err(IngressQueueError::CompletionQueue(source));
                         }

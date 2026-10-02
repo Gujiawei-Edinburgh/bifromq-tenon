@@ -52,7 +52,7 @@ const EMIT_ARGUMENTS_ERROR: &str = "emit arguments are invalid";
 pub(crate) enum EmitBoundary {
     Payload {
         sink_contract_id: SinkContractId,
-        payload: Vec<u8>,
+        record: sink::EncodedEgressRecord,
     },
     CompletionOnly,
 }
@@ -167,7 +167,7 @@ fn accept_emit(
         .map_err(|_| LuaApiFailure::InternalInvariantViolation)?;
     let boundary = EmitBoundary::Payload {
         sink_contract_id: payload.sink_contract_id().clone(),
-        payload: encode_deterministically(payload.message(), max_record_bytes)?,
+        record: encode_deterministically(payload.message(), max_record_bytes)?,
     };
     slot.accept(boundary)
 }
@@ -175,30 +175,26 @@ fn accept_emit(
 fn encode_deterministically(
     message: &DynamicMessage,
     max_record_bytes: NonZeroU64,
-) -> LuaApiResult<Vec<u8>> {
+) -> LuaApiResult<sink::EncodedEgressRecord> {
     let encoded_len = message.encoded_len();
     if sink::encoded_len(encoded_len) as u64 > max_record_bytes.get() {
         return Err(LuaApiFailure::Api("egress.record_too_large"));
     }
-    let mut output = Vec::new();
-    output
-        .try_reserve_exact(encoded_len)
-        .map_err(|_| LuaApiFailure::ResourceLimitExceeded)?;
-    encode_message(message, &mut output)?;
-    if output.len() != encoded_len {
-        return Err(LuaApiFailure::InternalInvariantViolation);
-    }
-    Ok(output)
+    sink::EncodedEgressRecord::try_encode(encoded_len, |output| {
+        let payload_start = output.len();
+        encode_message(message, output)?;
+        if output.len() - payload_start != encoded_len {
+            return Err(LuaApiFailure::InternalInvariantViolation);
+        }
+        Ok(())
+    })
 }
 
 fn encode_message(message: &DynamicMessage, output: &mut Vec<u8>) -> LuaApiResult<()> {
-    let mut fields = Vec::new();
-    fields
-        .try_reserve_exact(message.fields().count())
-        .map_err(|_| LuaApiFailure::ResourceLimitExceeded)?;
-    fields.extend(message.fields());
-    fields.sort_unstable_by_key(|(field, _)| field.number());
-    for (field, value) in fields {
+    // prost-reflect 0.16.5 iterates its BTreeMap in field-number order. This is
+    // not a public API guarantee; preserve emit_uses_canonical_field_and_map_key_order
+    // when upgrading the dependency. Map entries still require their own sort.
+    for (field, value) in message.fields() {
         encode_field(&field, value, output)?;
     }
     Ok(())

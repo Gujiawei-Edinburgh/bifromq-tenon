@@ -18,6 +18,7 @@
  */
 
 use super::*;
+use crate::contracts::sink::EgressRecord;
 use crate::pipeline::channel::FlowChannelControl;
 use crate::pipeline::channel::metrics::ChannelMetrics;
 use crate::pipeline::queue_test_support::wait_for_armed_loop;
@@ -39,7 +40,13 @@ fn a_full_last_target_prevents_any_partial_fanout_until_real_release() -> io::Re
     let second_path = directory.path().join("second");
     let (mut second, mut second_reader) = queue(&second_path, 16)?;
     assert!(matches!(
-        second.try_write(&[9; 8]).map_err(io::Error::other)?,
+        second
+            .try_write_with(
+                [9; 8].len(),
+                |destination| std::io::Write::write_all(destination, &[9; 8]),
+                || {}
+            )
+            .map_err(io::Error::other)?,
         WriteOutcome::Committed(_)
     ));
     assert!(matches!(
@@ -47,7 +54,8 @@ fn a_full_last_target_prevents_any_partial_fanout_until_real_release() -> io::Re
         ReadOutcome::Record(_)
     ));
     let mut route = route(first, second)?;
-    let writer = thread::spawn(move || route.send(vec![1], &ChannelMetrics::default(), || false));
+    let record = encoded_record(&[1])?;
+    let writer = thread::spawn(move || route.send(record, &ChannelMetrics::default(), || false));
 
     let armed = wait_for_armed_loop(
         &second_path,
@@ -90,7 +98,13 @@ fn stop_interrupts_a_full_target_without_committing_to_any_target() -> io::Resul
     let second_path = directory.path().join("second");
     let (mut second, mut second_reader) = queue(&second_path, 16)?;
     assert!(matches!(
-        second.try_write(&[9; 8]).map_err(io::Error::other)?,
+        second
+            .try_write_with(
+                [9; 8].len(),
+                |destination| std::io::Write::write_all(destination, &[9; 8]),
+                || {}
+            )
+            .map_err(io::Error::other)?,
         WriteOutcome::Committed(_)
     ));
     assert!(matches!(
@@ -101,8 +115,9 @@ fn stop_interrupts_a_full_target_without_committing_to_any_target() -> io::Resul
     let control = Arc::new(FlowChannelControl::new());
     let worker_control = Arc::clone(&control);
     let mut route = route(first, second)?;
+    let record = encoded_record(&[1])?;
     let writer = thread::spawn(move || {
-        route.send(vec![1], &ChannelMetrics::default(), || {
+        route.send(record, &ChannelMetrics::default(), || {
             worker_control.is_stopping()
         })
     });
@@ -131,6 +146,14 @@ fn stop_interrupts_a_full_target_without_committing_to_any_target() -> io::Resul
         ReadOutcome::Empty
     ));
     Ok(())
+}
+
+fn encoded_record(payload: &[u8]) -> io::Result<EncodedEgressRecord> {
+    EncodedEgressRecord::try_encode::<std::collections::TryReserveError>(payload.len(), |bytes| {
+        bytes.extend_from_slice(payload);
+        Ok(())
+    })
+    .map_err(io::Error::other)
 }
 
 fn queue(path: &Path, bytes: u64) -> io::Result<(QueueWriter, QueueReader)> {
@@ -222,7 +245,7 @@ fn direct_fanout_benchmark() -> io::Result<()> {
                         .get_mut(&contract)
                         .ok_or_else(|| io::Error::other("Benchmark route is bound"))?;
                     let SendOutcome::Committed(committed) = route
-                        .send(black_box(payload.clone()), &metrics, || false)
+                        .send(encoded_record(black_box(&payload))?, &metrics, || false)
                         .map_err(io::Error::other)?
                     else {
                         return Err(io::Error::other("Benchmark send was interrupted"));

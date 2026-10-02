@@ -36,7 +36,10 @@ use super::{
 };
 use crate::contracts::source::{IngressCompletion, IngressCompletionStatus, IngressRecord};
 use tenon_ipc::bell::{BellInterrupter, BellRegion, WaitOutcome, create_bell_region};
-use tenon_ipc::queue::{QueueReader, QueueWriter, ReadOutcome, WriteOutcome, create_queue_file};
+use tenon_ipc::queue::{
+    QueueReader, QueueWaiter, QueueWriter, ReadOutcome, WriteOutcome, create_queue_file,
+    queue_waiter_is_armed,
+};
 
 #[test]
 fn receive_returns_an_owned_record_and_releases_submission() -> io::Result<()> {
@@ -47,7 +50,11 @@ fn receive_returns_an_owned_record_and_releases_submission() -> io::Result<()> {
         payload: vec![1, 2, 3].into(),
     };
     let WriteOutcome::Committed(receipt) = source_writer
-        .try_write(&expected.encode_to_vec())
+        .try_write_with(
+            expected.encoded_len(),
+            |destination| expected.encode(destination).map_err(std::io::Error::other),
+            || {},
+        )
         .map_err(io::Error::other)?
     else {
         return Err(io::Error::other("Submission record was not committed"));
@@ -92,31 +99,56 @@ fn protobuf_decoding_reuses_the_owned_input_allocation() -> io::Result<()> {
 
 #[test]
 fn complete_commits_the_exact_completion_record() -> io::Result<()> {
+    #[derive(serde::Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    struct Vectors {
+        completion_valid: Vec<CompletionVector>,
+    }
+    #[derive(serde::Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    struct CompletionVector {
+        name: String,
+        record_id: u64,
+        status: String,
+        encoded: Vec<u8>,
+    }
+    let vectors: Vectors = serde_json::from_slice(include_bytes!(
+        "../../../contracts/source/test-fixtures/ingress_record_test_vectors.json"
+    ))
+    .map_err(io::Error::other)?;
+    assert!(!vectors.completion_valid.is_empty());
     let fixture = IngressPairFixture::new(2, 128)?;
     let mut pair = fixture.open_pair()?;
     let mut source_reader = fixture.source_completion_reader()?;
 
-    assert_eq!(
-        pair.complete(
-            41,
-            IngressCompletionStatus::Ok,
-            &ChannelMetrics::default(),
-            &mut ChannelMetrics::default().wait(WaitKind::CompletionCapacity)
-        )
-        .map_err(io::Error::other)?,
-        IngressCompletionWriteOutcome::Committed
-    );
-
-    let ReadOutcome::Record(record) = source_reader.try_read().map_err(io::Error::other)? else {
-        return Err(io::Error::other("Completion record was not committed"));
-    };
-    assert_eq!(
-        IngressCompletion::decode(record.payload()).map_err(io::Error::other)?,
-        IngressCompletion {
-            record_id: 41,
-            status: IngressCompletionStatus::Ok as i32,
-        }
-    );
+    for vector in vectors.completion_valid {
+        let status = match vector.status.as_str() {
+            "OK" => IngressCompletionStatus::Ok,
+            "RETRY" => IngressCompletionStatus::Retry,
+            "ERROR" => IngressCompletionStatus::Error,
+            // Admission backpressure never enters the Pipeline writer.
+            "BACKPRESSURE" => continue,
+            _ => return Err(io::Error::other("Unknown completion vector status")),
+        };
+        assert_eq!(
+            pair.complete(
+                vector.record_id,
+                status,
+                &ChannelMetrics::default(),
+                &mut ChannelMetrics::default().wait(WaitKind::CompletionCapacity)
+            )
+            .map_err(io::Error::other)?,
+            IngressCompletionWriteOutcome::Committed,
+            "{}",
+            vector.name
+        );
+        let ReadOutcome::Record(record) = source_reader.try_read().map_err(io::Error::other)?
+        else {
+            return Err(io::Error::other("Completion record was not committed"));
+        };
+        assert_eq!(record.payload(), vector.encoded, "{}", vector.name);
+        source_reader.release(1).map_err(io::Error::other)?;
+    }
     Ok(())
 }
 
@@ -135,15 +167,18 @@ fn submission_interruption_returns_control_without_reading() -> io::Result<()> {
     assert!(!pair.readable().map_err(io::Error::other)?);
     let mut source_writer = fixture.source_submission_writer()?;
     assert!(matches!(
-        source_writer
-            .try_write(
-                &IngressRecord {
-                    record_id: 42,
-                    payload: vec![4, 2].into(),
-                }
-                .encode_to_vec()
+        {
+            let record = IngressRecord {
+                record_id: 42,
+                payload: vec![4, 2].into(),
+            };
+            source_writer.try_write_with(
+                record.encoded_len(),
+                |destination| record.encode(destination).map_err(std::io::Error::other),
+                || {},
             )
-            .map_err(io::Error::other)?,
+        }
+        .map_err(io::Error::other)?,
         WriteOutcome::Committed(_)
     ));
     assert_eq!(
@@ -169,15 +204,18 @@ fn an_empty_submission_probe_leaves_the_queue_reusable() -> io::Result<()> {
 
     let mut source_writer = fixture.source_submission_writer()?;
     assert!(matches!(
-        source_writer
-            .try_write(
-                &IngressRecord {
-                    record_id: 43,
-                    payload: vec![4, 3].into(),
-                }
-                .encode_to_vec()
+        {
+            let record = IngressRecord {
+                record_id: 43,
+                payload: vec![4, 3].into(),
+            };
+            source_writer.try_write_with(
+                record.encoded_len(),
+                |destination| record.encode(destination).map_err(std::io::Error::other),
+                || {},
             )
-            .map_err(io::Error::other)?,
+        }
+        .map_err(io::Error::other)?,
         WriteOutcome::Committed(_)
     ));
     assert_eq!(
@@ -202,7 +240,11 @@ fn completion_interruption_leaves_a_full_queue_unchanged() -> io::Result<()> {
     for _ in 0..2 {
         assert!(matches!(
             initial_writer
-                .try_write(&encoded)
+                .try_write_with(
+                    encoded.len(),
+                    |destination| std::io::Write::write_all(destination, &encoded),
+                    || {}
+                )
                 .map_err(io::Error::other)?,
             WriteOutcome::Committed(_)
         ));
@@ -236,7 +278,11 @@ fn completion_wait_resumes_after_the_source_releases_space() -> io::Result<()> {
     for _ in 0..2 {
         assert!(matches!(
             initial_writer
-                .try_write(&encoded)
+                .try_write_with(
+                    encoded.len(),
+                    |destination| std::io::Write::write_all(destination, &encoded),
+                    || {}
+                )
                 .map_err(io::Error::other)?,
             WriteOutcome::Committed(_)
         ));
@@ -257,6 +303,21 @@ fn completion_wait_resumes_after_the_source_releases_space() -> io::Result<()> {
     });
 
     let release_result = (|| -> io::Result<()> {
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
+        while !queue_waiter_is_armed(
+            &fixture.completion_path,
+            &fixture._directory.path().join("channels.bells"),
+            QueueWaiter::Writer,
+        )
+        .map_err(io::Error::other)?
+        {
+            if std::time::Instant::now() >= deadline {
+                return Err(io::Error::other(
+                    "Completion writer never armed its doorbell",
+                ));
+            }
+            std::thread::yield_now();
+        }
         if !matches!(
             source_reader.try_read().map_err(io::Error::other)?,
             ReadOutcome::Record(_)
@@ -285,6 +346,18 @@ fn completion_wait_resumes_after_the_source_releases_space() -> io::Result<()> {
         .map_err(|_| io::Error::other("Completion writer thread panicked"))?;
     let completion = completion.map_err(io::Error::other)?;
     assert_eq!(completion, IngressCompletionWriteOutcome::Committed);
+    for expected in [encoded, maximum_completion(u64::MAX - 1)] {
+        let ReadOutcome::Record(record) = source_reader.try_read().map_err(io::Error::other)?
+        else {
+            return Err(io::Error::other("Completion record was not committed"));
+        };
+        assert_eq!(record.payload(), expected);
+        source_reader.release(1).map_err(io::Error::other)?;
+    }
+    assert!(matches!(
+        source_reader.try_read().map_err(io::Error::other)?,
+        ReadOutcome::Empty
+    ));
     Ok(())
 }
 
@@ -318,7 +391,11 @@ fn malformed_submission_is_not_released() -> io::Result<()> {
     let fixture = IngressPairFixture::new(2, 128)?;
     let mut source_writer = fixture.source_submission_writer()?;
     let WriteOutcome::Committed(receipt) = source_writer
-        .try_write(&[0x12, 0x02, 0x01])
+        .try_write_with(
+            [0x12, 0x02, 0x01].len(),
+            |destination| std::io::Write::write_all(destination, &[0x12, 0x02, 0x01]),
+            || {},
+        )
         .map_err(io::Error::other)?
     else {
         return Err(io::Error::other("Malformed Submission was not committed"));
@@ -393,7 +470,7 @@ proptest! {
             payload: payload.into(),
         };
         let WriteOutcome::Committed(receipt) = source_writer
-            .try_write(&expected.encode_to_vec())
+            .try_write_with(expected.encoded_len(), |destination| expected.encode(destination).map_err(std::io::Error::other), || {})
             .map_err(test_case_error)?
         else {
             return Err(TestCaseError::fail("Generated Submission record was not committed"));
@@ -532,7 +609,13 @@ fn completion_retry_after_interrupt_records_ready_when_capacity_has_returned() -
     .encode_to_vec();
     let mut writer = fixture.completion_filler()?;
     while matches!(
-        writer.try_write(&encoded).map_err(io::Error::other)?,
+        writer
+            .try_write_with(
+                encoded.len(),
+                |destination| std::io::Write::write_all(destination, &encoded),
+                || {}
+            )
+            .map_err(io::Error::other)?,
         WriteOutcome::Committed(_)
     ) {}
     drop(writer);
