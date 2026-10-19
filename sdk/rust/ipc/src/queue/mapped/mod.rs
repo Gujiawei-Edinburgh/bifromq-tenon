@@ -368,6 +368,22 @@ impl QueueWriter {
         ))
     }
 
+    /// Returns the free data bytes without changing Queue or Bell state.
+    ///
+    /// Frame headers, padding, and wrap gaps use this space. The reader can
+    /// release more space after this call. This method does not reserve space.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the live Queue positions are invalid.
+    pub fn free_bytes(&self) -> Result<u64, QueueRuntimeError> {
+        let memory = &self.core.memory;
+        let commit = memory.load_commit()?;
+        let release = memory.load_release()?;
+        validate_positions(memory.capacity(), commit, release)?;
+        Ok(memory.capacity().get() - (commit.get() - release.get()))
+    }
+
     /// Returns a thread-safe handle for waking the loop that waits on this writer.
     ///
     /// Every returned handle rings the loop doorbell this writer bound to. A
@@ -1450,6 +1466,59 @@ mod tests {
             NonZeroU32::new(slots).ok_or_else(|| io::Error::other("slots must be positive"))?;
         create_bell_region(&region_path, slot_count, 1).map_err(io::Error::other)?;
         BellRegion::open(&region_path).map_err(io::Error::other)
+    }
+
+    #[test]
+    fn free_bytes_changes_only_after_commit_or_release() -> io::Result<()> {
+        let directory = tempfile::tempdir()?;
+        let (mut writer, mut reader, _) = endpoint_pair(directory.path(), "queue", 48, 16)?;
+        assert_eq!(writer.free_bytes()?, 48);
+        for remaining in [24, 0] {
+            assert!(matches!(
+                writer.try_write_with(
+                    16,
+                    |destination| std::io::Write::write_all(destination, &[0; 16]),
+                    || {},
+                )?,
+                WriteOutcome::Committed(_)
+            ));
+            assert_eq!(writer.free_bytes()?, remaining);
+            assert!(matches!(reader.try_read()?, ReadOutcome::Record(_)));
+            assert_eq!(writer.free_bytes()?, remaining);
+        }
+        reader.release(1)?;
+        let queue_before = std::fs::read(directory.path().join("queue"))?;
+        let bell_before = std::fs::read(directory.path().join("loops.bells"))?;
+        assert_eq!(writer.free_bytes()?, 24);
+        assert_eq!(std::fs::read(directory.path().join("queue"))?, queue_before);
+        assert_eq!(
+            std::fs::read(directory.path().join("loops.bells"))?,
+            bell_before
+        );
+        reader.release(1)?;
+        assert_eq!(writer.free_bytes()?, 48);
+        Ok(())
+    }
+
+    #[test]
+    fn free_bytes_rejects_corrupt_live_positions() -> io::Result<()> {
+        let directory = tempfile::tempdir()?;
+        let (writer, _reader, _) = endpoint_pair(directory.path(), "queue", 48, 16)?;
+        for (commit, release, expected) in [
+            (1, 0, FormatError::UnalignedPosition),
+            (16, 1, FormatError::UnalignedPosition),
+            (16, 24, FormatError::ReleaseAheadOfCommit),
+            (64, 0, FormatError::OccupancyExceedsCapacity),
+        ] {
+            let mapping = &writer.core.memory.mapping;
+            store_atomic_u64(mapping, COMMIT_OFFSET, commit, POSITION_STORE_ORDERING);
+            store_atomic_u64(mapping, RELEASE_OFFSET, release, POSITION_STORE_ORDERING);
+            assert!(matches!(
+                writer.free_bytes(),
+                Err(QueueRuntimeError::Format(error)) if error == expected
+            ));
+        }
+        Ok(())
     }
 
     #[test]
